@@ -435,7 +435,7 @@ public class DungeonGame : MonoBehaviour
                         Debug.Log(playerName + " is fine");
                     }
                 }
-                else if (spiderBiteDuration <= 0)
+                else if (spiderBiteDuration == 0)
                 {
                     spiderBite = false;
                     spiderBiteDuration = 3;
@@ -486,6 +486,7 @@ public class DungeonGame : MonoBehaviour
                 else
                 {
                     heavyAttackCounter -= 1;
+                    spiderVenomTaken = false;
                 }
 
 
@@ -534,6 +535,7 @@ public class DungeonGame : MonoBehaviour
                 else
                 {
                     heavyAttackCounter -= 1;
+                    spiderVenomTaken = false;
                 }
             }
             else if (playerLuck > spiderArmor)
