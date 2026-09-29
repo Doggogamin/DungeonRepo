@@ -44,7 +44,7 @@ public class DungeonGame : MonoBehaviour
         bool spiderVenomTaken = false;
         int roomNumber = 0;
         int campfireCounter = 10;
-
+        bool playerAlive = true;
 
 
         // ===== ALREADY BUILT IN CLASS (Intro lecture): the opening + two rooms =====
@@ -188,6 +188,7 @@ public class DungeonGame : MonoBehaviour
         else if (playerHealth <= 0)
         {
             Debug.Log("You were defeated by the goblin");
+            playerAlive = false;
         }
 
 
@@ -220,178 +221,186 @@ public class DungeonGame : MonoBehaviour
         Debug.Log("You now have " + playerAgility + " agility");
         Debug.Log("There is a ogre blocking your path");
         Debug.Log("You attack the ogre");
-        do
+        if (playerAlive)
         {
-
-
-
-
-            int playerLuck = Random.Range(1, 6);
-            int enemyLuck = Random.Range(1, 6);
-
-            if (playerLuck < ogreArmor)
+            do
             {
-                Debug.Log("Ogre's armor deflected your attack");
 
-                if (heavyAttackCounter == 0)
+
+
+
+                int playerLuck = Random.Range(1, 6);
+                int enemyLuck = Random.Range(1, 6);
+
+                if (playerLuck < ogreArmor)
                 {
-                    if (enemyLuck < playerArmor)
+                    Debug.Log("Ogre's armor deflected your attack");
+
+                    if (heavyAttackCounter == 0)
                     {
-                        Debug.Log("You deflected the ogre's attack");
-                        heavyAttackCounter = heavyAttackCounterMax;
-                    }
-                    else if (enemyLuck > playerArmor)
-                    {
-                        playerHealth -= ogreAttack;
-                        heavyAttackCounter = heavyAttackCounterMax;
-                        Debug.Log("You took " + ogreAttack + " damage from the ogre");
-                        if (playerHealth <= 0)
+                        if (enemyLuck < playerArmor)
                         {
-                            Debug.Log(playerName + " Collapsed");
-                            break;
+                            Debug.Log("You deflected the ogre's attack");
+                            heavyAttackCounter = heavyAttackCounterMax;
                         }
-                        else if (playerHealth <= 2)
+                        else if (enemyLuck > playerArmor)
                         {
-                            Debug.Log(playerName + " is badly injured");
-                        }
-                        else
-                        {
-                            Debug.Log(playerName + " is fine");
-                        }
-                    }
-                }
-                else
-                {
-                    heavyAttackCounter -= 1;
-                }
-
-
-
-
-
-
-            }
-
-            else if (playerLuck > ogreArmor && playerLuck >= 4)
-            {
-                ogreHealth -= playerAttack;
-                ogreHealth -= playerCritDamage;
-                Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + " damage to the ogre with a critical hit");
-
-                if (heavyAttackCounter == 0)
-                {
-                    if (enemyLuck < playerArmor && ogreHealth > 0)
-                    {
-                        Debug.Log("You deflected the ogre's attack");
-                        heavyAttackCounter = heavyAttackCounterMax;
-                    }
-                    else if (enemyLuck > playerArmor && ogreHealth > 0)
-                    {
-                        playerHealth -= ogreAttack;
-                        heavyAttackCounter = heavyAttackCounterMax;
-                        Debug.Log("You took " + ogreAttack + " damage from the ogre");
-                        if (playerHealth <= 0)
-                        {
-                            Debug.Log(playerName + " Collapsed");
-                            break;
-                        }
-                        else if (playerHealth <= 2)
-                        {
-                            Debug.Log(playerName + " is badly injured");
-                        }
-                        else
-                        {
-                            Debug.Log(playerName + " is fine");
+                            playerHealth -= ogreAttack;
+                            heavyAttackCounter = heavyAttackCounterMax;
+                            Debug.Log("You took " + ogreAttack + " damage from the ogre");
+                            if (playerHealth <= 0)
+                            {
+                                Debug.Log(playerName + " Collapsed");
+                                break;
+                            }
+                            else if (playerHealth <= 2)
+                            {
+                                Debug.Log(playerName + " is badly injured");
+                            }
+                            else
+                            {
+                                Debug.Log(playerName + " is fine");
+                            }
                         }
                     }
-                }
-                else
-                {
-                    heavyAttackCounter -= 1;
-                }
-            }
-            else if (playerLuck > ogreArmor)
-            {
-                ogreHealth -= playerAttack;
-                Debug.Log("You dealt " + playerAttack + " damage to the ogre");
-
-                if (heavyAttackCounter == 0)
-                {
-                    if (enemyLuck < playerArmor && ogreHealth > 0)
+                    else
                     {
-                        Debug.Log("You deflected the ogre's attack");
-                        heavyAttackCounter = heavyAttackCounterMax;
+                        heavyAttackCounter -= 1;
                     }
-                    else if (enemyLuck > playerArmor && ogreHealth > 0)
-                    {
-                        playerHealth -= ogreAttack;
-                        heavyAttackCounter = heavyAttackCounterMax;
-                        Debug.Log("You took " + ogreAttack + " damage from the ogre");
-                        if (playerHealth <= 0)
-                        {
-                            Debug.Log(playerName + " Collapsed");
-                            break;
-                        }
-                        else if (playerHealth <= 2)
-                        {
-                            Debug.Log(playerName + " is badly injured");
-                        }
-                        else
-                        {
-                            Debug.Log(playerName + " is fine");
-                        }
-                    }
+
+
+
+
+
+
                 }
-                else
+
+                else if (playerLuck > ogreArmor && playerLuck >= 4)
                 {
-                    heavyAttackCounter -= 1;
+                    ogreHealth -= playerAttack;
+                    ogreHealth -= playerCritDamage;
+                    Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + " damage to the ogre with a critical hit");
+
+                    if (heavyAttackCounter == 0)
+                    {
+                        if (enemyLuck < playerArmor && ogreHealth > 0)
+                        {
+                            Debug.Log("You deflected the ogre's attack");
+                            heavyAttackCounter = heavyAttackCounterMax;
+                        }
+                        else if (enemyLuck > playerArmor && ogreHealth > 0)
+                        {
+                            playerHealth -= ogreAttack;
+                            heavyAttackCounter = heavyAttackCounterMax;
+                            Debug.Log("You took " + ogreAttack + " damage from the ogre");
+                            if (playerHealth <= 0)
+                            {
+                                Debug.Log(playerName + " Collapsed");
+                                break;
+                            }
+                            else if (playerHealth <= 2)
+                            {
+                                Debug.Log(playerName + " is badly injured");
+                            }
+                            else
+                            {
+                                Debug.Log(playerName + " is fine");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        heavyAttackCounter -= 1;
+                    }
                 }
-            }
+                else if (playerLuck > ogreArmor)
+                {
+                    ogreHealth -= playerAttack;
+                    Debug.Log("You dealt " + playerAttack + " damage to the ogre");
+
+                    if (heavyAttackCounter == 0)
+                    {
+                        if (enemyLuck < playerArmor && ogreHealth > 0)
+                        {
+                            Debug.Log("You deflected the ogre's attack");
+                            heavyAttackCounter = heavyAttackCounterMax;
+                        }
+                        else if (enemyLuck > playerArmor && ogreHealth > 0)
+                        {
+                            playerHealth -= ogreAttack;
+                            heavyAttackCounter = heavyAttackCounterMax;
+                            Debug.Log("You took " + ogreAttack + " damage from the ogre");
+                            if (playerHealth <= 0)
+                            {
+                                Debug.Log(playerName + " Collapsed");
+                                break;
+                            }
+                            else if (playerHealth <= 2)
+                            {
+                                Debug.Log(playerName + " is badly injured");
+                            }
+                            else
+                            {
+                                Debug.Log(playerName + " is fine");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        heavyAttackCounter -= 1;
+                    }
+                }
 
 
-        } while (playerHealth > 0 && ogreHealth > 0);
+            } while (playerHealth > 0 && ogreHealth > 0);
+        }
+        
 
 
 
         if (ogreHealth <= 0)
         {
             Debug.Log("You defeated the ogre");
+            Debug.Log("You move into the next room.");
+            Debug.Log("The Dusty Library");
+            Debug.Log("The walls are covered in dusty books from floor to ceiling, there is a large door at the end of the room, and there is a merchant selling potions");
+            roomNumber += 1;
+            if (roomNumber % 3 == 0)
+            {
+                Debug.Log("Room has a red glow");
+            }
+            Debug.Log("You buy a potion from the merchant for 5 gold");
+
+            playerGold -= 5;
+            playerPotions += 1;
+            Debug.Log("You now have " + playerGold + " gold");
+            Debug.Log("You now have " + playerPotions + " potions");
+
+            int playerKeyChance = Random.Range(1, 10);
+            if (playerKeyChance <= 3)
+            {
+                Debug.Log("You walk away and see nothing on the ground");
+            }
+            else if (playerKeyChance >= 4)
+            {
+                hasKey = true;
+                Debug.Log("You find a key on the floor");
+
+            }
+
+            Debug.Log("You move into the next room.");
+            Debug.Log("you reach a vault door and a long hallway around the vault");
         }
         else if (playerHealth <= 0)
         {
             Debug.Log("You were defeated by the ogre");
+            playerAlive = false;
         }
-        Debug.Log("You move into the next room.");
+
 
         // TODO A2: write at least one of your OWN room - a Room Name line,
         //          a description line, and a line describing how you exit. 
-        Debug.Log("The Dusty Library");
-        Debug.Log("The walls are covered in dusty books from floor to ceiling, there is a large door at the end of the room, and there is a merchant selling potions");
-        roomNumber += 1;
-        if (roomNumber % 3 == 0)
-        {
-            Debug.Log("Room has a red glow");
-        }
-        Debug.Log("You buy a potion from the merchant for 5 gold");
 
-        playerGold -= 5;
-        playerPotions += 1;
-        Debug.Log("You now have " + playerGold + " gold");
-        Debug.Log("You now have " + playerPotions + " potions");
-
-        int playerKeyChance = Random.Range(1, 10);
-        if (playerKeyChance <= 3)
-        {
-            Debug.Log("You walk away and see nothing on the ground");
-        }
-        else if (playerKeyChance >= 4)
-        {
-            hasKey = true;
-            Debug.Log("You find a key on the floor");
-
-        }
-
-        Debug.Log("You move into the next room.");
         // TODO A3: write the EXIT room - a final "room" and description that leads the
         //          player out of the dungeon.
 
@@ -399,7 +408,7 @@ public class DungeonGame : MonoBehaviour
 
 
 
-        Debug.Log("you reach a vault door and a long hallway around the vault");
+
 
         if (hasKey && playerHealth > 0)
         {
@@ -441,204 +450,208 @@ public class DungeonGame : MonoBehaviour
         }
         Debug.Log("A spider drops down from the ceiling");
         Debug.Log("You attack the spider");
-
-        do
+        if (playerAlive)
         {
-
-
-
-            if (spiderBite == true && spiderVenomTaken == false)
+            do
             {
-                if (spiderBiteDuration > 0)
+
+
+
+                if (spiderBite == true && spiderVenomTaken == false)
                 {
-                    playerHealth -= spiderVenomDamage;
-                    spiderBiteDuration -= 1;
-                    spiderVenomTaken = true;
-                    Debug.Log("You took " + spiderVenomDamage + " venom damage from the spider");
-                    if (playerHealth <= 0)
+                    if (spiderBiteDuration > 0)
                     {
-                        Debug.Log(playerName + " Collapsed");
-                        break;
+                        playerHealth -= spiderVenomDamage;
+                        spiderBiteDuration -= 1;
+                        spiderVenomTaken = true;
+                        Debug.Log("You took " + spiderVenomDamage + " venom damage from the spider");
+                        if (playerHealth <= 0)
+                        {
+                            Debug.Log(playerName + " Collapsed");
+                            break;
+                        }
+                        else if (playerHealth <= 2)
+                        {
+                            Debug.Log(playerName + " is badly injured");
+                        }
+                        else
+                        {
+                            Debug.Log(playerName + " is fine");
+                        }
                     }
-                    else if (playerHealth <= 2)
+                    else if (spiderBiteDuration == 0)
                     {
-                        Debug.Log(playerName + " is badly injured");
+                        spiderBite = false;
+                        spiderBiteDuration = 3;
+                    }
+
+
+                }
+
+
+
+                int playerLuck = Random.Range(1, 6);
+                int enemyLuck = Random.Range(1, 6);
+
+                if (playerLuck < spiderArmor)
+                {
+                    Debug.Log("Spider's armor deflected your attack");
+
+                    if (heavyAttackCounter == 0)
+                    {
+                        if (enemyLuck < playerArmor)
+                        {
+                            Debug.Log("You deflected the spider's attack");
+                            heavyAttackCounter = heavyAttackCounterMax;
+                            spiderVenomTaken = false;
+                        }
+                        else if (enemyLuck > playerArmor)
+                        {
+                            playerHealth -= spiderAttack;
+                            spiderBite = true;
+                            heavyAttackCounter = heavyAttackCounterMax;
+                            spiderVenomTaken = false;
+                            Debug.Log("You took " + spiderAttack + " damage from the spider");
+                            if (playerHealth <= 0)
+                            {
+                                Debug.Log(playerName + " Collapsed");
+                                break;
+                            }
+                            else if (playerHealth <= 2)
+                            {
+                                Debug.Log(playerName + " is badly injured");
+                            }
+                            else
+                            {
+                                Debug.Log(playerName + " is fine");
+                            }
+                        }
                     }
                     else
                     {
-                        Debug.Log(playerName + " is fine");
-                    }
-                }
-                else if (spiderBiteDuration == 0)
-                {
-                    spiderBite = false;
-                    spiderBiteDuration = 3;
-                }
-
-
-            }
-
-
-
-            int playerLuck = Random.Range(1, 6);
-            int enemyLuck = Random.Range(1, 6);
-
-            if (playerLuck < spiderArmor)
-            {
-                Debug.Log("Spider's armor deflected your attack");
-
-                if (heavyAttackCounter == 0)
-                {
-                    if (enemyLuck < playerArmor)
-                    {
-                        Debug.Log("You deflected the spider's attack");
-                        heavyAttackCounter = heavyAttackCounterMax;
+                        heavyAttackCounter -= 1;
                         spiderVenomTaken = false;
                     }
-                    else if (enemyLuck > playerArmor)
+
+
+
+
+
+
+                }
+
+                else if (playerLuck > spiderArmor && playerLuck >= 4)
+                {
+                    spiderHealth -= playerAttack;
+                    spiderHealth -= playerCritDamage;
+                    Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + " damage to the spider with a critical hit");
+
+                    if (heavyAttackCounter == 0)
                     {
-                        playerHealth -= spiderAttack;
-                        spiderBite = true;
-                        heavyAttackCounter = heavyAttackCounterMax;
-                        spiderVenomTaken = false;
-                        Debug.Log("You took " + spiderAttack + " damage from the spider");
-                        if (playerHealth <= 0)
+                        if (enemyLuck < playerArmor && spiderHealth > 0)
                         {
-                            Debug.Log(playerName + " Collapsed");
-                            break;
+                            Debug.Log("You deflected the spider's attack");
+                            heavyAttackCounter = heavyAttackCounterMax;
+                            spiderVenomTaken = false;
                         }
-                        else if (playerHealth <= 2)
+                        else if (enemyLuck > playerArmor && spiderHealth > 0)
                         {
-                            Debug.Log(playerName + " is badly injured");
-                        }
-                        else
-                        {
-                            Debug.Log(playerName + " is fine");
+                            playerHealth -= spiderAttack;
+                            spiderBite = true;
+                            heavyAttackCounter = heavyAttackCounterMax;
+                            spiderVenomTaken = false;
+                            Debug.Log("You took " + spiderAttack + " damage from the spider");
+                            if (playerHealth <= 0)
+                            {
+                                Debug.Log(playerName + " Collapsed");
+                                break;
+                            }
+                            else if (playerHealth <= 2)
+                            {
+                                Debug.Log(playerName + " is badly injured");
+                            }
+                            else
+                            {
+                                Debug.Log(playerName + " is fine");
+                            }
                         }
                     }
-                }
-                else
-                {
-                    heavyAttackCounter -= 1;
-                    spiderVenomTaken = false;
-                }
-
-
-
-
-
-
-            }
-
-            else if (playerLuck > spiderArmor && playerLuck >= 4)
-            {
-                spiderHealth -= playerAttack;
-                spiderHealth -= playerCritDamage;
-                Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + " damage to the spider with a critical hit");
-
-                if (heavyAttackCounter == 0)
-                {
-                    if (enemyLuck < playerArmor && spiderHealth > 0)
+                    else
                     {
-                        Debug.Log("You deflected the spider's attack");
-                        heavyAttackCounter = heavyAttackCounterMax;
+                        heavyAttackCounter -= 1;
                         spiderVenomTaken = false;
                     }
-                    else if (enemyLuck > playerArmor && spiderHealth > 0)
+                }
+                else if (playerLuck > spiderArmor)
+                {
+                    spiderHealth -= playerAttack;
+                    Debug.Log("You dealt " + playerAttack + " damage to the spider");
+
+                    if (heavyAttackCounter == 0)
                     {
-                        playerHealth -= spiderAttack;
-                        spiderBite = true;
-                        heavyAttackCounter = heavyAttackCounterMax;
-                        spiderVenomTaken = false;
-                        Debug.Log("You took " + spiderAttack + " damage from the spider");
-                        if (playerHealth <= 0)
+                        if (enemyLuck < playerArmor && spiderHealth > 0)
                         {
-                            Debug.Log(playerName + " Collapsed");
-                            break;
+                            Debug.Log("You deflected the spider's attack");
+                            heavyAttackCounter = heavyAttackCounterMax;
+                            spiderVenomTaken = false;
                         }
-                        else if (playerHealth <= 2)
+                        else if (enemyLuck > playerArmor && spiderHealth > 0)
                         {
-                            Debug.Log(playerName + " is badly injured");
-                        }
-                        else
-                        {
-                            Debug.Log(playerName + " is fine");
+                            playerHealth -= spiderAttack;
+                            spiderBite = true;
+                            heavyAttackCounter = heavyAttackCounterMax;
+                            spiderVenomTaken = false;
+                            Debug.Log("You took " + spiderAttack + " damage from the spider");
+                            if (playerHealth <= 0)
+                            {
+                                Debug.Log(playerName + " Collapsed");
+                                break;
+                            }
+                            else if (playerHealth <= 2)
+                            {
+                                Debug.Log(playerName + " is badly injured");
+                            }
+                            else
+                            {
+                                Debug.Log(playerName + " is fine");
+                            }
                         }
                     }
-                }
-                else
-                {
-                    heavyAttackCounter -= 1;
-                    spiderVenomTaken = false;
-                }
-            }
-            else if (playerLuck > spiderArmor)
-            {
-                spiderHealth -= playerAttack;
-                Debug.Log("You dealt " + playerAttack + " damage to the spider");
-
-                if (heavyAttackCounter == 0)
-                {
-                    if (enemyLuck < playerArmor && spiderHealth > 0)
+                    else
                     {
-                        Debug.Log("You deflected the spider's attack");
-                        heavyAttackCounter = heavyAttackCounterMax;
+                        heavyAttackCounter -= 1;
                         spiderVenomTaken = false;
                     }
-                    else if (enemyLuck > playerArmor && spiderHealth > 0)
-                    {
-                        playerHealth -= spiderAttack;
-                        spiderBite = true;
-                        heavyAttackCounter = heavyAttackCounterMax;
-                        spiderVenomTaken = false;
-                        Debug.Log("You took " + spiderAttack + " damage from the spider");
-                        if (playerHealth <= 0)
-                        {
-                            Debug.Log(playerName + " Collapsed");
-                            break;
-                        }
-                        else if (playerHealth <= 2)
-                        {
-                            Debug.Log(playerName + " is badly injured");
-                        }
-                        else
-                        {
-                            Debug.Log(playerName + " is fine");
-                        }
-                    }
                 }
-                else
-                {
-                    heavyAttackCounter -= 1;
-                    spiderVenomTaken = false;
-                }
-            }
 
 
-        } while (playerHealth > 0 && spiderHealth > 0);
+            } while (playerHealth > 0 && spiderHealth > 0);
+        }
+        
 
 
 
         if (spiderHealth <= 0)
         {
             Debug.Log("You defeated the spider");
+            Debug.Log("You move to the door and exit the dungeon");
+
+            Debug.Log("You find a campfire");
+            while (playerHealth != playerMaxHealth && campfireCounter > 0)
+            {
+
+                Debug.Log("You sit at the campfire to regain health and regain 1 health");
+                playerHealth += 1;
+                campfireCounter -= 1;
+            }
+            Debug.Log("You now have " + playerHealth + " health");
         }
         else if (playerHealth <= 0)
         {
             Debug.Log("You were defeated by the spider");
         }
 
-        Debug.Log("You move to the door and exit the dungeon");
-
-        Debug.Log("You find a campfire");
-        while (playerHealth != playerMaxHealth && campfireCounter > 0)
-        {
-
-            Debug.Log("You sit at the campfire to regain health and regain 1 health");
-            playerHealth += 1;
-            campfireCounter -= 1;
-        }
-        Debug.Log("You now have " + playerHealth + " health");
+        
         // ======================================================================
         // PART B  -  after the VARIABLES lecture (variables & operators)
         // ======================================================================
