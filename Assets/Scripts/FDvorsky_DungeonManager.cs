@@ -21,9 +21,10 @@ public class DungeonGame : MonoBehaviour
         int playerArmor = 2;
         int playerPotions = 0;
         int playerHealth = 15;
+        int playerMaxHealth = 15;
         int playerAttack = 2;
         int playerAgility = 5;
-        int playerGold = 15; 
+        int playerGold = 15;
         bool hasKey = false;
         int goblinHealth = 3;
         int goblinAttack = 2;
@@ -42,7 +43,7 @@ public class DungeonGame : MonoBehaviour
         int heavyAttackCounterMax = 1;
         bool spiderVenomTaken = false;
         int roomNumber = 0;
-
+        int campfireCounter = 10;
 
 
 
@@ -54,7 +55,7 @@ public class DungeonGame : MonoBehaviour
         Debug.Log("The Entrance Hall");
         Debug.Log("A torch flickers on the wall. A stone doorway leads north.");
         roomNumber += 1;
-            if (roomNumber % 3 == 0)
+        if (roomNumber % 3 == 0)
         {
             Debug.Log("Room has a red glow");
         }
@@ -172,15 +173,15 @@ public class DungeonGame : MonoBehaviour
                     }
 
                 }
-            
+
             }
-            
+
 
         } while (playerHealth > 0 && goblinHealth > 0);
-            
-        
-        
-        if(goblinHealth <= 0)
+
+
+
+        if (goblinHealth <= 0)
         {
             Debug.Log("You defeated the goblin");
         }
@@ -207,8 +208,8 @@ public class DungeonGame : MonoBehaviour
         // TODO A1: FIX THE BROKEN ROOM below. It has bugs that stops the program
         //          from running. Un-comment the lines, find the bug(s), fix it,
         //          and add a // comment saying what was wrong.
-         Debug.Log("The Flooded Passage");
-         Debug.Log("Ankle-deep water fills the hall. A broken door is at the end of the hallway.");
+        Debug.Log("The Flooded Passage");
+        Debug.Log("Ankle-deep water fills the hall. A broken door is at the end of the hallway.");
         roomNumber += 1;
         if (roomNumber % 3 == 0)
         {
@@ -221,7 +222,7 @@ public class DungeonGame : MonoBehaviour
         Debug.Log("You attack the ogre");
         do
         {
-            
+
 
 
 
@@ -346,11 +347,11 @@ public class DungeonGame : MonoBehaviour
                     heavyAttackCounter -= 1;
                 }
             }
-            
+
 
         } while (playerHealth > 0 && ogreHealth > 0);
 
-        
+
 
         if (ogreHealth <= 0)
         {
@@ -365,17 +366,17 @@ public class DungeonGame : MonoBehaviour
         // TODO A2: write at least one of your OWN room - a Room Name line,
         //          a description line, and a line describing how you exit. 
         Debug.Log("The Dusty Library");
-         Debug.Log("The walls are covered in dusty books from floor to ceiling, there is a large door at the end of the room, and there is a merchant selling potions");
+        Debug.Log("The walls are covered in dusty books from floor to ceiling, there is a large door at the end of the room, and there is a merchant selling potions");
         roomNumber += 1;
         if (roomNumber % 3 == 0)
         {
             Debug.Log("Room has a red glow");
         }
         Debug.Log("You buy a potion from the merchant for 5 gold");
-         
-         playerGold -= 5;
-         playerPotions += 1;
-         Debug.Log("You now have " + playerGold + " gold");
+
+        playerGold -= 5;
+        playerPotions += 1;
+        Debug.Log("You now have " + playerGold + " gold");
         Debug.Log("You now have " + playerPotions + " potions");
 
         int playerKeyChance = Random.Range(1, 10);
@@ -383,7 +384,7 @@ public class DungeonGame : MonoBehaviour
         {
             Debug.Log("You walk away and see nothing on the ground");
         }
-        else if(playerKeyChance >= 4)
+        else if (playerKeyChance >= 4)
         {
             hasKey = true;
             Debug.Log("You find a key on the floor");
@@ -440,15 +441,15 @@ public class DungeonGame : MonoBehaviour
         }
         Debug.Log("A spider drops down from the ceiling");
         Debug.Log("You attack the spider");
-        
+
         do
         {
-           
-            
-            
+
+
+
             if (spiderBite == true && spiderVenomTaken == false)
             {
-               if (spiderBiteDuration > 0)
+                if (spiderBiteDuration > 0)
                 {
                     playerHealth -= spiderVenomDamage;
                     spiderBiteDuration -= 1;
@@ -476,8 +477,8 @@ public class DungeonGame : MonoBehaviour
 
 
             }
-            
-            
+
+
 
             int playerLuck = Random.Range(1, 6);
             int enemyLuck = Random.Range(1, 6);
@@ -486,7 +487,7 @@ public class DungeonGame : MonoBehaviour
             {
                 Debug.Log("Spider's armor deflected your attack");
 
-               if(heavyAttackCounter == 0 )
+                if (heavyAttackCounter == 0)
                 {
                     if (enemyLuck < playerArmor)
                     {
@@ -612,7 +613,7 @@ public class DungeonGame : MonoBehaviour
                     spiderVenomTaken = false;
                 }
             }
-            
+
 
         } while (playerHealth > 0 && spiderHealth > 0);
 
@@ -628,6 +629,16 @@ public class DungeonGame : MonoBehaviour
         }
 
         Debug.Log("You move to the door and exit the dungeon");
+
+        Debug.Log("You find a campfire");
+        while (playerHealth != playerMaxHealth && campfireCounter > 0)
+        {
+
+            Debug.Log("You sit at the campfire to regain health and regain 1 health");
+            playerHealth += 1;
+            campfireCounter -= 1;
+        }
+        Debug.Log("You now have " + playerHealth + " health");
         // ======================================================================
         // PART B  -  after the VARIABLES lecture (variables & operators)
         // ======================================================================
@@ -635,7 +646,7 @@ public class DungeonGame : MonoBehaviour
         // TODO B2: FIX THE BROKEN ROOM below. It has bugs that stops the program
         //          from running. Un-comment the lines, find the bug(s), fix it,
         //          and add a // comment saying what was wrong.
-       
+
 
         // TODO B3: Go back through your rooms above and add an event/item to each
         //          one that changes a stat/variable, printing the new value right
