@@ -41,7 +41,7 @@ public class DungeonGame : MonoBehaviour
         int heavyAttackCounter = 0;
         int heavyAttackCounterMax = 1;
         bool spiderVenomTaken = false;
-
+        int roomNumber = 0;
 
 
 
@@ -53,13 +53,21 @@ public class DungeonGame : MonoBehaviour
         Debug.Log("");
         Debug.Log("The Entrance Hall");
         Debug.Log("A torch flickers on the wall. A stone doorway leads north.");
-        
-
+        roomNumber += 1;
+            if (roomNumber % 3 == 0)
+        {
+            Debug.Log("Room has a red glow");
+        }
         Debug.Log("You move into the next room.");
 
         Debug.Log("");
         Debug.Log("The Guard Room");
         Debug.Log("A rusty sword rests on a table. A goblin snores in the corner.");
+        roomNumber += 1;
+        if (roomNumber % 3 == 0)
+        {
+            Debug.Log("Room has a red glow");
+        }
         Debug.Log("You pick up the sword which gives you an extra 2 attack, the goblin wakes up because of the noise");
         playerAttack += 2;
         Debug.Log("You now have " + playerAttack + " attack");
@@ -201,6 +209,11 @@ public class DungeonGame : MonoBehaviour
         //          and add a // comment saying what was wrong.
          Debug.Log("The Flooded Passage");
          Debug.Log("Ankle-deep water fills the hall. A broken door is at the end of the hallway.");
+        roomNumber += 1;
+        if (roomNumber % 3 == 0)
+        {
+            Debug.Log("Room has a red glow");
+        }
         Debug.Log("Your boots are filled with water and you lose 1 agility");
         playerAgility -= 1;
         Debug.Log("You now have " + playerAgility + " agility");
@@ -353,7 +366,12 @@ public class DungeonGame : MonoBehaviour
         //          a description line, and a line describing how you exit. 
         Debug.Log("The Dusty Library");
          Debug.Log("The walls are covered in dusty books from floor to ceiling, there is a large door at the end of the room, and there is a merchant selling potions");
-         Debug.Log("You buy a potion from the merchant for 5 gold");
+        roomNumber += 1;
+        if (roomNumber % 3 == 0)
+        {
+            Debug.Log("Room has a red glow");
+        }
+        Debug.Log("You buy a potion from the merchant for 5 gold");
          
          playerGold -= 5;
          playerPotions += 1;
@@ -385,6 +403,11 @@ public class DungeonGame : MonoBehaviour
         if (hasKey && playerHealth > 0)
         {
             Debug.Log("The Treasure Room");
+            roomNumber += 1;
+            if (roomNumber % 3 == 0)
+            {
+                Debug.Log("Room has a red glow");
+            }
             playerGold += 5000;
             Debug.Log("It seems this room has been raided. You find " + 5000 + " gold.");
             Debug.Log("You now have " + playerGold + " gold");
@@ -398,6 +421,11 @@ public class DungeonGame : MonoBehaviour
         else
         {
             Debug.Log("You do not have a key and must go around");
+            roomNumber += 1;
+            if (roomNumber % 3 == 0)
+            {
+                Debug.Log("The path around has a red glow");
+            }
         }
 
 
@@ -405,6 +433,11 @@ public class DungeonGame : MonoBehaviour
 
         Debug.Log("Long stair case");
         Debug.Log("A long staircase that leads to a large wooden door");
+        roomNumber += 1;
+        if (roomNumber % 3 == 0)
+        {
+            Debug.Log("Room has a red glow");
+        }
         Debug.Log("A spider drops down from the ceiling");
         Debug.Log("You attack the spider");
         
