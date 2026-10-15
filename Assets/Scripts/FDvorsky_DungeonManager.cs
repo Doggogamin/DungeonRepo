@@ -12,86 +12,127 @@ public class DungeonGame : MonoBehaviour
 {
     void Start()
     {
-        // (PART B) TODO B1: declare your stats here, at the very top of Start,
-        //          once you have had the Variables lecture. You will need:
-        //            playerName (string), health (int), attack (int),
-        //            agility (int), gold (int), hasKey (bool),
-        //            goblinHealth (int), goblinAttack (int).
+        string[] roomNames = 
+            {
+            "The Entrance Hall",
+            "The Guard Room",
+            "The Flooded Passage",
+            "The Dusty Library",
+            "The Treasure Room",
+            "Long stair case"
+        };
+        string[] roomDescriptions =
+            {
+            "A torch flickers on the wall. A stone doorway leads north.",
+            "A rusty sword rests on a table. A goblin snores in the corner.",
+            "Ankle-deep water fills the hall. A broken door is at the end of the hallway.",
+            "The walls are covered in dusty books from floor to ceiling, there is a large door at the end of the room, and there is a merchant selling potions",
+            "It seems this room has been raided.",
+            "A long staircase that leads to a large wooden door" 
+        };
+        foreach (string roomName in roomNames)
+        {
+            Debug.Log(roomName);
+        }
+        
         string playerName = "Flip";
+        //
         int playerArmor = 2;
+        //
         int playerPotions = 0;
+        //
         int playerHealth = 15;
+        //
         int playerMaxHealth = 15;
+        //
         int playerAttack = 2;
+        //
         int playerAgility = 5;
+        //
         int playerGold = 15;
-        bool hasKey = false;
-        int goblinHealth = 3;
-        int goblinAttack = 2;
-        int goblinArmor = 2;
-        int ogreHealth = 20;
-        int ogreAttack = 4;
-        int ogreArmor = 2;
-        int spiderHealth = 15;
-        int spiderAttack = 2;
-        int spiderArmor = 3;
+        //
+        
+        //
         int spiderVenomDamage = 2;
         bool spiderBite = false;
         int spiderBiteDuration = 3;
+        bool spiderVenomTaken = false;
+        //
         int playerCritDamage = 2;
         int heavyAttackCounter = 0;
         int heavyAttackCounterMax = 1;
-        bool spiderVenomTaken = false;
-        int roomNumber = 0;
-        int campfireCounter = 10;
+        
+        //
         bool playerAlive = true;
-
-
-        // ===== ALREADY BUILT IN CLASS (Intro lecture): the opening + two rooms =====
+        //
+        string[] enemyNames =
+            {
+            "Goblin",
+            "Ogre",
+            "Spider"
+        };
+        int swordDamageBoost = 2;
+        int[] enemyHealth = { 3, 20, 15, };
+        int[] enemyAttack = { 2, 4, 2 };
+        int[] enemyArmor = { 2, 2, 3 };
+        int[] roomEnemy = { -1, 0, 1, -1, -1, 2 };
+        int[] roomGold = { 0, 0, 0, 0, 5000, 0 };
+        string[] items = { "empty weapon slot", "empty heal slot", "empty shield slot", "empty key slot" };
+        bool[] visitedRooms = { false, false, false, false, false, false };
+        string[] possibleRewards = { "Sword", "Key", "Potion" };
+        int roomNumber = 0;
+        //
         Debug.Log("=== THE DUNGEON ===");
-        Debug.Log("Welcome, " + playerName + ". Your escape begins."); // replace Hero with the name of your player.
-
+        Debug.Log("Welcome, " + playerName + ". Your escape begins.");
+        Debug.Log("Your possible rewards include");
+        foreach (string possibleReward in possibleRewards)
+        {
+            Debug.Log(possibleReward);
+        }
+        //room 1 index 0
         Debug.Log("");
-        Debug.Log("The Entrance Hall");
-        Debug.Log("A torch flickers on the wall. A stone doorway leads north.");
-        roomNumber += 1;
+        Debug.Log(roomNames[roomNumber]);
+        Debug.Log(roomDescriptions[roomNumber]);
+        visitedRooms[roomNumber] = true;
         if (roomNumber % 3 == 0)
         {
             Debug.Log("Room has a red glow");
         }
         Debug.Log("You move into the next room.");
-
-        Debug.Log("");
-        Debug.Log("The Guard Room");
-        Debug.Log("A rusty sword rests on a table. A goblin snores in the corner.");
+        //room 2 index 1
         roomNumber += 1;
+        Debug.Log("");
+        Debug.Log(roomNames[roomNumber]);
+        Debug.Log(roomDescriptions[roomNumber]);
+        visitedRooms[roomNumber] = true;
         if (roomNumber % 3 == 0)
         {
             Debug.Log("Room has a red glow");
         }
         Debug.Log("You pick up the sword which gives you an extra 2 attack, the goblin wakes up because of the noise");
-        playerAttack += 2;
-        Debug.Log("You now have " + playerAttack + " attack");
-        Debug.Log("The goblin attacks you, it has an attack power of " + goblinAttack);
-        //Goblin attacks
+        items[0] = "Sword";
+        Debug.Log("The goblin attacks you, it has an attack power of " + enemyAttack[roomEnemy[roomNumber]]);
+        //Goblin Fight
 
         do
         {
-            int playerLuck = Random.Range(1, 6);
-            int enemyLuck = Random.Range(1, 4);
+            
+            int playerRandomChance = Random.Range(1, 6);
+            int enemyRandomChance = Random.Range(1, 4);
+            
 
-            if (playerLuck < goblinArmor)
+            if (playerRandomChance < enemyArmor[roomEnemy[roomNumber]])
             {
-                Debug.Log("Goblin's armor deflected your attack");
+                Debug.Log(enemyNames[roomEnemy[roomNumber]] + " armor deflected your attack");
 
-                if (enemyLuck < playerArmor)
+                if (enemyRandomChance < playerArmor)
                 {
-                    Debug.Log("You deflected the goblin's attack");
+                    Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
                 }
-                else if (enemyLuck > playerArmor)
+                else if (enemyRandomChance > playerArmor)
                 {
-                    playerHealth -= goblinAttack;
-                    Debug.Log("You took " + goblinAttack + " damage from the goblin");
+                    playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+                    Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
                     if (playerHealth <= 0)
                     {
                         Debug.Log(playerName + " Collapsed");
@@ -107,111 +148,167 @@ public class DungeonGame : MonoBehaviour
                     }
                 }
 
-
-
-
-
-
             }
-
-            else if (playerLuck > goblinArmor && playerLuck >= 4)
+            
+            else if (playerRandomChance > enemyArmor[roomEnemy[roomNumber]] && playerRandomChance >= 4)
             {
-                goblinHealth -= playerAttack;
-                goblinHealth -= playerCritDamage;
-                Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + " damage to the goblin with a critical hit");
-
-                if (enemyLuck < playerArmor && goblinHealth > 0)
+                if (items[0] == "Sword")
                 {
-                    Debug.Log("You deflected the goblin's attack");
+                    enemyHealth[roomEnemy[roomNumber]] -= swordDamageBoost + playerAttack + playerCritDamage;
+                    Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + "plus" + swordDamageBoost + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
+                    
+                        if (enemyRandomChance < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                        {
+                            Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
+                            
+                            
+                        }
+                        else if (enemyRandomChance > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                        {
+                            playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+                            
+                            Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
+                            if (playerHealth <= 0)
+                            {
+                                Debug.Log(playerName + " Collapsed");
+                                break;
+                            }
+                            else if (playerHealth <= 2)
+                            {
+                                Debug.Log(playerName + " is badly injured");
+                            }
+                            else
+                            {
+                                Debug.Log(playerName + " is fine");
+                            }
+                        }
+                    
+                    
                 }
-                else if (enemyLuck > playerArmor && goblinHealth > 0)
+                else
                 {
-                    playerHealth -= goblinAttack;
-                    Debug.Log("You took " + goblinAttack + " damage from the goblin");
-                    if (playerHealth <= 0)
-                    {
-                        Debug.Log(playerName + " Collapsed");
-                        break;
-                    }
-                    else if (playerHealth <= 2)
-                    {
-                        Debug.Log(playerName + " is badly injured");
-                    }
-                    else
-                    {
-                        Debug.Log(playerName + " is fine");
-                    }
-
+                    Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
+                    
+                        if (enemyRandomChance < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                        {
+                            Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
+                            
+                            
+                        }
+                        else if (enemyRandomChance > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                        {
+                            playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+                            
+                            Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
+                            if (playerHealth <= 0)
+                            {
+                                Debug.Log(playerName + " Collapsed");
+                                break;
+                            }
+                            else if (playerHealth <= 2)
+                            {
+                                Debug.Log(playerName + " is badly injured");
+                            }
+                            else
+                            {
+                                Debug.Log(playerName + " is fine");
+                            }
+                        }
+                    
+                    
                 }
 
             }
-            else if (playerLuck > goblinArmor)
+            else if (playerRandomChance > enemyArmor[roomEnemy[roomNumber]])
             {
-                goblinHealth -= playerAttack;
-                Debug.Log("You dealt " + playerAttack + " damage to the goblin");
+                if (items[0] == "Sword")
+                {
+                    enemyHealth[roomEnemy[roomNumber]] -= swordDamageBoost + playerAttack + playerCritDamage;
+                    Debug.Log("You dealt " + playerAttack + " plus " + swordDamageBoost + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
 
-                if (enemyLuck < playerArmor && goblinHealth > 0)
-                {
-                    Debug.Log("You deflected the goblin's attack");
+                    if (enemyRandomChance < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                    {
+                        Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
+                        heavyAttackCounter = heavyAttackCounterMax;
+                        
+                    }
+                    else if (enemyRandomChance > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                    {
+                        playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+
+                        Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
+                        if (playerHealth <= 0)
+                        {
+                            Debug.Log(playerName + " Collapsed");
+                            break;
+                        }
+                        else if (playerHealth <= 2)
+                        {
+                            Debug.Log(playerName + " is badly injured");
+                        }
+                        else
+                        {
+                            Debug.Log(playerName + " is fine");
+                        }
+                    }
+
+
                 }
-                else if (enemyLuck > playerArmor && goblinHealth > 0)
+                else
                 {
-                    playerHealth -= goblinAttack;
-                    Debug.Log("You took " + goblinAttack + " damage from the goblin");
-                    if (playerHealth <= 0)
+                    Debug.Log("You dealt " + playerAttack + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
+
+                    if (enemyRandomChance < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
                     {
-                        Debug.Log(playerName + " Collapsed");
-                        break;
+                        Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
+                        heavyAttackCounter = heavyAttackCounterMax;
+                        
                     }
-                    else if (playerHealth <= 2)
+                    else if (enemyRandomChance > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
                     {
-                        Debug.Log(playerName + " is badly injured");
+                        playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+
+                        Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
+                        if (playerHealth <= 0)
+                        {
+                            Debug.Log(playerName + " Collapsed");
+                            break;
+                        }
+                        else if (playerHealth <= 2)
+                        {
+                            Debug.Log(playerName + " is badly injured");
+                        }
+                        else
+                        {
+                            Debug.Log(playerName + " is fine");
+                        }
                     }
-                    else
-                    {
-                        Debug.Log(playerName + " is fine");
-                    }
+
 
                 }
 
             }
 
 
-        } while (playerHealth > 0 && goblinHealth > 0);
+        } while (playerHealth > 0 && enemyHealth[roomEnemy[roomNumber]] > 0);
 
 
 
-        if (goblinHealth <= 0)
+        if (enemyHealth[roomEnemy[roomNumber]] <= 0)
         {
-            Debug.Log("You defeated the goblin");
+            Debug.Log("You defeated the " + enemyNames[roomEnemy[roomNumber]]);
         }
         else if (playerHealth <= 0)
         {
-            Debug.Log("You were defeated by the goblin");
+            Debug.Log("You were defeated by the " + enemyNames[roomEnemy[roomNumber]]);
             playerAlive = false;
         }
-
-
-
-
-
-
-
-
-
-
-        Debug.Log("You move into the next room.");
-
-        // ======================================================================
-        // PART A  -  after the INTRO lecture (Debug.Log only)
-        // ======================================================================
-
-        // TODO A1: FIX THE BROKEN ROOM below. It has bugs that stops the program
-        //          from running. Un-comment the lines, find the bug(s), fix it,
-        //          and add a // comment saying what was wrong.
-        Debug.Log("The Flooded Passage");
-        Debug.Log("Ankle-deep water fills the hall. A broken door is at the end of the hallway.");
+//room 3 index 2
         roomNumber += 1;
+        Debug.Log("You move into the next room.");
+        Debug.Log(roomNames[roomNumber]);
+        Debug.Log(roomDescriptions[roomNumber]);
+        visitedRooms[roomNumber] = true;
         if (roomNumber % 3 == 0)
         {
             Debug.Log("Room has a red glow");
@@ -225,29 +322,32 @@ public class DungeonGame : MonoBehaviour
         {
             do
             {
+                
 
 
 
+                int playerRandomChance = Random.Range(1, 6);
+                int enemyRandomChance = Random.Range(1, 6);
 
-                int playerLuck = Random.Range(1, 6);
-                int enemyLuck = Random.Range(1, 6);
-
-                if (playerLuck < ogreArmor)
+                if (playerRandomChance < enemyArmor[roomEnemy[roomNumber]])
                 {
-                    Debug.Log("Ogre's armor deflected your attack");
+                    Debug.Log(enemyNames[roomEnemy[roomNumber]] + " armor deflected your attack");
 
                     if (heavyAttackCounter == 0)
                     {
-                        if (enemyLuck < playerArmor)
+                        if (enemyRandomChance < playerArmor)
                         {
-                            Debug.Log("You deflected the ogre's attack");
+                            Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
                             heavyAttackCounter = heavyAttackCounterMax;
+                            
                         }
-                        else if (enemyLuck > playerArmor)
+                        else if (enemyRandomChance > playerArmor)
                         {
-                            playerHealth -= ogreAttack;
+                            playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+                            
                             heavyAttackCounter = heavyAttackCounterMax;
-                            Debug.Log("You took " + ogreAttack + " damage from the ogre");
+                            
+                            Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
                             if (playerHealth <= 0)
                             {
                                 Debug.Log(playerName + " Collapsed");
@@ -266,6 +366,7 @@ public class DungeonGame : MonoBehaviour
                     else
                     {
                         heavyAttackCounter -= 1;
+                        
                     }
 
 
@@ -275,96 +376,147 @@ public class DungeonGame : MonoBehaviour
 
                 }
 
-                else if (playerLuck > ogreArmor && playerLuck >= 4)
+                else if (playerRandomChance > enemyArmor[roomEnemy[roomNumber]] && playerRandomChance >= 4)
                 {
-                    ogreHealth -= playerAttack;
-                    ogreHealth -= playerCritDamage;
-                    Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + " damage to the ogre with a critical hit");
 
-                    if (heavyAttackCounter == 0)
+                    if (items[0] == "Sword")
                     {
-                        if (enemyLuck < playerArmor && ogreHealth > 0)
+                        enemyHealth[roomEnemy[roomNumber]] -= swordDamageBoost + playerAttack + playerCritDamage;
+                        Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + "plus" + swordDamageBoost + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
+                        if (heavyAttackCounter == 0)
                         {
-                            Debug.Log("You deflected the ogre's attack");
-                            heavyAttackCounter = heavyAttackCounterMax;
+                            if (enemyRandomChance < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                            {
+                                Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
+                                heavyAttackCounter = heavyAttackCounterMax;
+                                
+                            }
+                            else if (enemyRandomChance > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                            {
+                                playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+                                
+                                heavyAttackCounter = heavyAttackCounterMax;
+                                
+                                Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
+                                if (playerHealth <= 0)
+                                {
+                                    Debug.Log(playerName + " Collapsed");
+                                    break;
+                                }
+                                else if (playerHealth <= 2)
+                                {
+                                    Debug.Log(playerName + " is badly injured");
+                                }
+                                else
+                                {
+                                    Debug.Log(playerName + " is fine");
+                                }
+                            }
                         }
-                        else if (enemyLuck > playerArmor && ogreHealth > 0)
+                        else
                         {
-                            playerHealth -= ogreAttack;
-                            heavyAttackCounter = heavyAttackCounterMax;
-                            Debug.Log("You took " + ogreAttack + " damage from the ogre");
-                            if (playerHealth <= 0)
-                            {
-                                Debug.Log(playerName + " Collapsed");
-                                break;
-                            }
-                            else if (playerHealth <= 2)
-                            {
-                                Debug.Log(playerName + " is badly injured");
-                            }
-                            else
-                            {
-                                Debug.Log(playerName + " is fine");
-                            }
+                            heavyAttackCounter -= 1;
+                            
                         }
                     }
                     else
                     {
-                        heavyAttackCounter -= 1;
+                        Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
+                        if (heavyAttackCounter == 0)
+                        {
+                            if (enemyRandomChance < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                            {
+                                Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
+                                heavyAttackCounter = heavyAttackCounterMax;
+                                
+                            }
+                            else if (enemyRandomChance > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                            {
+                                playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+                                
+                                heavyAttackCounter = heavyAttackCounterMax;
+                                
+                                Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
+                                if (playerHealth <= 0)
+                                {
+                                    Debug.Log(playerName + " Collapsed");
+                                    break;
+                                }
+                                else if (playerHealth <= 2)
+                                {
+                                    Debug.Log(playerName + " is badly injured");
+                                }
+                                else
+                                {
+                                    Debug.Log(playerName + " is fine");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            heavyAttackCounter -= 1;
+                            
+                        }
                     }
                 }
-                else if (playerLuck > ogreArmor)
+                else if (playerRandomChance > enemyArmor[roomEnemy[roomNumber]])
                 {
-                    ogreHealth -= playerAttack;
-                    Debug.Log("You dealt " + playerAttack + " damage to the ogre");
-
-                    if (heavyAttackCounter == 0)
+                    if (items[0] == "Sword")
                     {
-                        if (enemyLuck < playerArmor && ogreHealth > 0)
+                        enemyHealth[roomEnemy[roomNumber]] -= swordDamageBoost + playerAttack;
+                        Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + "plus" + swordDamageBoost + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
+                        if (heavyAttackCounter == 0)
                         {
-                            Debug.Log("You deflected the ogre's attack");
-                            heavyAttackCounter = heavyAttackCounterMax;
+                            if (enemyRandomChance < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                            {
+                                Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
+                                heavyAttackCounter = heavyAttackCounterMax;
+                                
+                            }
+                            else if (enemyRandomChance > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                            {
+                                playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+                                
+                                heavyAttackCounter = heavyAttackCounterMax;
+                                
+                                Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
+                                if (playerHealth <= 0)
+                                {
+                                    Debug.Log(playerName + " Collapsed");
+                                    break;
+                                }
+                                else if (playerHealth <= 2)
+                                {
+                                    Debug.Log(playerName + " is badly injured");
+                                }
+                                else
+                                {
+                                    Debug.Log(playerName + " is fine");
+                                }
+                            }
                         }
-                        else if (enemyLuck > playerArmor && ogreHealth > 0)
+                        else
                         {
-                            playerHealth -= ogreAttack;
-                            heavyAttackCounter = heavyAttackCounterMax;
-                            Debug.Log("You took " + ogreAttack + " damage from the ogre");
-                            if (playerHealth <= 0)
-                            {
-                                Debug.Log(playerName + " Collapsed");
-                                break;
-                            }
-                            else if (playerHealth <= 2)
-                            {
-                                Debug.Log(playerName + " is badly injured");
-                            }
-                            else
-                            {
-                                Debug.Log(playerName + " is fine");
-                            }
+                            heavyAttackCounter -= 1;
                         }
-                    }
-                    else
-                    {
-                        heavyAttackCounter -= 1;
                     }
                 }
 
 
-            } while (playerHealth > 0 && ogreHealth > 0);
+            } while (playerHealth > 0 && enemyHealth[roomEnemy[roomNumber]] > 0);
         }
-        
 
 
 
-        if (ogreHealth <= 0)
+        //room 4 index 3
+        if (enemyHealth[roomEnemy[roomNumber]] <= 0)
         {
+            roomNumber += 1;
             Debug.Log("You defeated the ogre");
             Debug.Log("You move into the next room.");
-            Debug.Log("The Dusty Library");
-            Debug.Log("The walls are covered in dusty books from floor to ceiling, there is a large door at the end of the room, and there is a merchant selling potions");
-            roomNumber += 1;
+            Debug.Log(roomNames[roomNumber]);
+            Debug.Log(roomDescriptions[roomNumber]);
+            visitedRooms[roomNumber] = true;
             if (roomNumber % 3 == 0)
             {
                 Debug.Log("Room has a red glow");
@@ -373,6 +525,7 @@ public class DungeonGame : MonoBehaviour
 
             playerGold -= 5;
             playerPotions += 1;
+            items[1] = "Potion";
             Debug.Log("You now have " + playerGold + " gold");
             Debug.Log("You now have " + playerPotions + " potions");
 
@@ -383,7 +536,8 @@ public class DungeonGame : MonoBehaviour
             }
             else if (playerKeyChance >= 4)
             {
-                hasKey = true;
+                
+                items[3] = "Key";
                 Debug.Log("You find a key on the floor");
 
             }
@@ -398,28 +552,19 @@ public class DungeonGame : MonoBehaviour
         }
 
 
-        // TODO A2: write at least one of your OWN room - a Room Name line,
-        //          a description line, and a line describing how you exit. 
-
-        // TODO A3: write the EXIT room - a final "room" and description that leads the
-        //          player out of the dungeon.
-
-
-
-
-
-
-
-        if (hasKey && playerHealth > 0)
+        roomNumber += 1;
+        visitedRooms[roomNumber] = true;
+        //room 5 index 4
+        if (items[3] == "Key" && playerHealth > 0)
         {
-            Debug.Log("The Treasure Room");
-            roomNumber += 1;
+            Debug.Log(roomNames[roomNumber]);
+            
             if (roomNumber % 3 == 0)
             {
                 Debug.Log("Room has a red glow");
             }
-            playerGold += 5000;
-            Debug.Log("It seems this room has been raided. You find " + 5000 + " gold.");
+            playerGold += roomGold[roomNumber];
+            Debug.Log(roomDescriptions[roomNumber]);
             Debug.Log("You now have " + playerGold + " gold");
             Debug.Log("You move into the next room.");
         }
@@ -427,23 +572,20 @@ public class DungeonGame : MonoBehaviour
         {
             Debug.Log("You are dead and can't continue");
 
+
         }
+        
         else
         {
             Debug.Log("You do not have a key and must go around");
-            roomNumber += 1;
-            if (roomNumber % 3 == 0)
-            {
-                Debug.Log("The path around has a red glow");
-            }
         }
 
 
-
-
-        Debug.Log("Long stair case");
-        Debug.Log("A long staircase that leads to a large wooden door");
+        //room 6 index 5
         roomNumber += 1;
+        Debug.Log(roomNames[roomNumber]);
+        Debug.Log(roomDescriptions[roomNumber]);
+        visitedRooms[roomNumber] = true;
         if (roomNumber % 3 == 0)
         {
             Debug.Log("Room has a red glow");
@@ -454,9 +596,6 @@ public class DungeonGame : MonoBehaviour
         {
             do
             {
-
-
-
                 if (spiderBite == true && spiderVenomTaken == false)
                 {
                     if (spiderBiteDuration > 0)
@@ -490,28 +629,28 @@ public class DungeonGame : MonoBehaviour
 
 
 
-                int playerLuck = Random.Range(1, 6);
-                int enemyLuck = Random.Range(1, 6);
+                int playerRandomChance = Random.Range(1, 6);
+                int enemyRandomChance = Random.Range(1, 6);
 
-                if (playerLuck < spiderArmor)
+                if (playerRandomChance < enemyArmor[roomEnemy[roomNumber]])
                 {
-                    Debug.Log("Spider's armor deflected your attack");
+                    Debug.Log(enemyNames[roomEnemy[roomNumber]] + " armor deflected your attack");
 
                     if (heavyAttackCounter == 0)
                     {
-                        if (enemyLuck < playerArmor)
+                        if (enemyRandomChance < playerArmor)
                         {
-                            Debug.Log("You deflected the spider's attack");
+                            Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
                             heavyAttackCounter = heavyAttackCounterMax;
                             spiderVenomTaken = false;
                         }
-                        else if (enemyLuck > playerArmor)
+                        else if (enemyRandomChance > playerArmor)
                         {
-                            playerHealth -= spiderAttack;
+                            playerHealth -= enemyAttack[roomEnemy[roomNumber]];
                             spiderBite = true;
                             heavyAttackCounter = heavyAttackCounterMax;
                             spiderVenomTaken = false;
-                            Debug.Log("You took " + spiderAttack + " damage from the spider");
+                            Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
                             if (playerHealth <= 0)
                             {
                                 Debug.Log(playerName + " Collapsed");
@@ -540,108 +679,150 @@ public class DungeonGame : MonoBehaviour
 
                 }
 
-                else if (playerLuck > spiderArmor && playerLuck >= 4)
+                else if (playerRandomChance > enemyArmor[roomEnemy[roomNumber]] && playerRandomChance >= 4)
                 {
-                    spiderHealth -= playerAttack;
-                    spiderHealth -= playerCritDamage;
-                    Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + " damage to the spider with a critical hit");
-
-                    if (heavyAttackCounter == 0)
+                    
+                    if (items[0] == "Sword")
                     {
-                        if (enemyLuck < playerArmor && spiderHealth > 0)
+                        enemyHealth[roomEnemy[roomNumber]] -= swordDamageBoost + playerAttack + playerCritDamage;
+                        Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + "plus" + swordDamageBoost + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
+                        if (heavyAttackCounter == 0)
                         {
-                            Debug.Log("You deflected the spider's attack");
-                            heavyAttackCounter = heavyAttackCounterMax;
-                            spiderVenomTaken = false;
+                            if (enemyRandomChance < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                            {
+                                Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
+                                heavyAttackCounter = heavyAttackCounterMax;
+                                spiderVenomTaken = false;
+                            }
+                            else if (enemyRandomChance > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                            {
+                                playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+                                spiderBite = true;
+                                heavyAttackCounter = heavyAttackCounterMax;
+                                spiderVenomTaken = false;
+                                Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
+                                if (playerHealth <= 0)
+                                {
+                                    Debug.Log(playerName + " Collapsed");
+                                    break;
+                                }
+                                else if (playerHealth <= 2)
+                                {
+                                    Debug.Log(playerName + " is badly injured");
+                                }
+                                else
+                                {
+                                    Debug.Log(playerName + " is fine");
+                                }
+                            }
                         }
-                        else if (enemyLuck > playerArmor && spiderHealth > 0)
+                        else
                         {
-                            playerHealth -= spiderAttack;
-                            spiderBite = true;
-                            heavyAttackCounter = heavyAttackCounterMax;
+                            heavyAttackCounter -= 1;
                             spiderVenomTaken = false;
-                            Debug.Log("You took " + spiderAttack + " damage from the spider");
-                            if (playerHealth <= 0)
-                            {
-                                Debug.Log(playerName + " Collapsed");
-                                break;
-                            }
-                            else if (playerHealth <= 2)
-                            {
-                                Debug.Log(playerName + " is badly injured");
-                            }
-                            else
-                            {
-                                Debug.Log(playerName + " is fine");
-                            }
                         }
                     }
                     else
                     {
-                        heavyAttackCounter -= 1;
-                        spiderVenomTaken = false;
+                        Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
+                        if (heavyAttackCounter == 0)
+                        {
+                            if (enemyRandomChance < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                            {
+                                Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
+                                heavyAttackCounter = heavyAttackCounterMax;
+                                spiderVenomTaken = false;
+                            }
+                            else if (enemyRandomChance > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                            {
+                                playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+                                spiderBite = true;
+                                heavyAttackCounter = heavyAttackCounterMax;
+                                spiderVenomTaken = false;
+                                Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
+                                if (playerHealth <= 0)
+                                {
+                                    Debug.Log(playerName + " Collapsed");
+                                    break;
+                                }
+                                else if (playerHealth <= 2)
+                                {
+                                    Debug.Log(playerName + " is badly injured");
+                                }
+                                else
+                                {
+                                    Debug.Log(playerName + " is fine");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            heavyAttackCounter -= 1;
+                            spiderVenomTaken = false;
+                        }
                     }
                 }
-                else if (playerLuck > spiderArmor)
+                else if (playerRandomChance > enemyArmor[roomEnemy[roomNumber]])
                 {
-                    spiderHealth -= playerAttack;
-                    Debug.Log("You dealt " + playerAttack + " damage to the spider");
-
-                    if (heavyAttackCounter == 0)
+                    if (items[0] == "Sword")
                     {
-                        if (enemyLuck < playerArmor && spiderHealth > 0)
+                        enemyHealth[roomEnemy[roomNumber]] -= swordDamageBoost + playerAttack;
+                        Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + "plus" + swordDamageBoost + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
+                        if (heavyAttackCounter == 0)
                         {
-                            Debug.Log("You deflected the spider's attack");
-                            heavyAttackCounter = heavyAttackCounterMax;
+                            if (enemyRandomChance < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                            {
+                                Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
+                                heavyAttackCounter = heavyAttackCounterMax;
+                                spiderVenomTaken = false;
+                            }
+                            else if (enemyRandomChance > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                            {
+                                playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+                                spiderBite = true;
+                                heavyAttackCounter = heavyAttackCounterMax;
+                                spiderVenomTaken = false;
+                                Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
+                                if (playerHealth <= 0)
+                                {
+                                    Debug.Log(playerName + " Collapsed");
+                                    break;
+                                }
+                                else if (playerHealth <= 2)
+                                {
+                                    Debug.Log(playerName + " is badly injured");
+                                }
+                                else
+                                {
+                                    Debug.Log(playerName + " is fine");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            heavyAttackCounter -= 1;
                             spiderVenomTaken = false;
                         }
-                        else if (enemyLuck > playerArmor && spiderHealth > 0)
-                        {
-                            playerHealth -= spiderAttack;
-                            spiderBite = true;
-                            heavyAttackCounter = heavyAttackCounterMax;
-                            spiderVenomTaken = false;
-                            Debug.Log("You took " + spiderAttack + " damage from the spider");
-                            if (playerHealth <= 0)
-                            {
-                                Debug.Log(playerName + " Collapsed");
-                                break;
-                            }
-                            else if (playerHealth <= 2)
-                            {
-                                Debug.Log(playerName + " is badly injured");
-                            }
-                            else
-                            {
-                                Debug.Log(playerName + " is fine");
-                            }
-                        }
-                    }
-                    else
-                    {
-                        heavyAttackCounter -= 1;
-                        spiderVenomTaken = false;
                     }
                 }
 
 
-            } while (playerHealth > 0 && spiderHealth > 0);
+            } while (playerHealth > 0 && enemyHealth[roomEnemy[roomNumber]] > 0);
         }
-        
 
 
-
-        if (spiderHealth <= 0)
+        int campfireCounter = 10;
+        int campfireHeal = 5;
+        if (enemyHealth[roomEnemy[roomNumber]] <= 0)
         {
             Debug.Log("You defeated the spider");
             Debug.Log("You move to the door and exit the dungeon");
-
             Debug.Log("You find a campfire");
-            while (playerHealth != playerMaxHealth && campfireCounter > 0)
+            while (playerHealth <= playerMaxHealth && campfireCounter > 0)
             {
 
                 Debug.Log("You sit at the campfire to regain health and regain 1 health");
-                playerHealth += 1;
+                playerHealth += campfireHeal;
                 campfireCounter -= 1;
             }
             Debug.Log("You now have " + playerHealth + " health");
@@ -650,132 +831,167 @@ public class DungeonGame : MonoBehaviour
         {
             Debug.Log("You were defeated by the spider");
         }
-
-        
-        // ======================================================================
-        // PART B  -  after the VARIABLES lecture (variables & operators)
-        // ======================================================================
-
-        // TODO B2: FIX THE BROKEN ROOM below. It has bugs that stops the program
-        //          from running. Un-comment the lines, find the bug(s), fix it,
-        //          and add a // comment saying what was wrong.
-
-
-        // TODO B3: Go back through your rooms above and add an event/item to each
-        //          one that changes a stat/variable, printing the new value right
-        //          after the event. Like with the gold in the treasure room, keep
-        //          each event inside the room where it happens. Possible events:
-        //            pick up a sword to increase attack      
-        //            step on a trap        
-        //            grab the rusty key    
-        //            (your own event)
-
-        // TODO B4: In the appropriate room, add a goblin. The goblin attacks the
-        //          player and the player attacks the goblin. Use the variables
-        //          you've created in PART A to simulate this with code. After the
-        //          simulation is done, Print both healths, then print whether or 
-        //          not the goblin is defeated. 
-
-        // TODO B5: Add a new room somewhere before the exit that has a merchant. 
-        //          The merchant sells potions for 5 gold each. Print how many
-        //          potions you can afford and how much gold you will have left over. 
-
-        // TODO B6: Add a defense stat (declare it up top with the others). Use it
-        //          in your combat so the goblin's hit damage is reduced by your
-        //          defense and your hit damage is reduced by the goblin's defense
-        //          Then, add an item that raises defense in a room. 
+        Debug.Log("Your final inventory");
+        Debug.Log("▽ ▽ ▽ ▽ ▽");
+        foreach (string item in items)
+        {
+            Debug.Log(item);
+        }
     }
 }
-// ================= PART A - CONDITIONALS (do after L7) =================
 
-// A1: After the goblin fight, report whether the goblin was defeated or
 
-//     the hero was the one who fell.
+//******** ARRAYS *********
+// A1: ROOMS INTO ARRAYS. Put your existing room names and descriptions into DONE
 
-// A2: At a vault door, the hero may pass only if they are carrying the
+//     two arrays (roomNames[i] and roomDescsriptions[i] describe the SAME
 
-//     key and are still alive. If they cannot pass, report which of the
+//     room). Keep the same rooms you already have (do not add or remove any).
 
-//     two requirements they are missing.
+// 
 
-// A3: The passage forks in two. Send the hero down one of the routes and
+//     Hint: How many elements should be in the roomNames array? What about
 
-//     describe each one - the two routes may even rejoin at the same
-
-//     place further on.
-
-// A4: As the hero explores, every third room they enter has a red glow.
-
-//     Given the number of the room the hero is standing in, report
-
-//     whether this room has the red glow.
-
-// A5: Whenever the hero takes damage, report their condition: collapsed
-
-//     if no health remains, badly wounded if their health has dropped
-
-//     dangerously low, or otherwise hurt but steady. This is a snippet
-
-//     you will reuse a lot - go back through everything you have already
-
-//     written (INCLUDING your previous assignment) and drop it in right
-
-//     after every place the hero loses health (the spike trap, and
-
-//     anywhere else). You will add it again in Part B after each hit the
-
-//     hero takes in a fight.
+//     the roomDescriptions array? Should they be different lengths or the same?
 
 
 
-// ================= PART B - LOOPS (do after L8) =================
+// A2: SHOW THE MAP. At the very start of the game, output every room name with DONE 
 
-// Place the following combat encounters in different rooms of your choice.
+//     a single loop (a quick map of the dungeon) using Debug.Log
 
-// B1: A goblin blocks the way - fight it round by round until one of you
+//
 
-//     runs out of health. Give the hero and the goblin each an armor
+//      Hint: What new type of loop can you use for this that works specifically
 
-//     class. On every swing, roll a die (Random.Range works well) and
+//      with containers?
 
-//     compare it to the target's armor class: the blow only lands if the
 
-//     roll meets or beats that armor class. On top of that, any of the
 
-//     hero's landed hits can be a critical hit that deals extra damage.
+// A3: MOVE BY INDEX. Keep a currentRoom number that starts at 0. Each time the DONE
 
-//     Report each roll and its result, and after any round in which the
+//     player moves on, add 1 to it and show that room's name and description
 
-//     hero takes damage, run your A5 condition check.
+//     from the arrays, instead of hand-writing each room's header.
 
-// B2: Beyond the goblin waits an ogre - slow, but brutal. Fight it the
 
-//     same way (armor classes, dice rolls to hit, and the hero's chance
 
-//     to crit), except the ogre is so sluggish it only swings every
+// A4: ONE INVENTORY ARRAY. Replace your separate item flags (hasKey, the DONE
 
-//     other round. Fight until one of them falls, and keep running your
+//     sword, the shield, and so on) with a single inventory array. Add an item
 
-//     A5 check whenever the hero takes damage.
+//     to it each time the player picks something up.
 
-// B3: Then a giant spider drops from the ceiling. Fight it just like the
+//
 
-//     ogre - dice-and-armor-class swings, the hero's crits, and it too
+//     Hint: How big does this array need to be? What data type should it be?
 
-//     only strikes every other round - but its bite is venomous: any
 
-//     time it lands a hit, the hero is poisoned and loses 2 health at
 
-//     the start of each of the next three rounds, on top of the bite
+// A5: SHOW THE LOOT. At the end of the run, print the player's whole inventory Done
 
-//     itself. Fight until one of them falls, running your A5 check after
 
-//     any damage (including the poison ticks).
 
-// B4: With the fights behind them, the hero rests at a campfire,
+// A6: KEY FROM THE INVENTORY. At the vault door, do not use a hasKey bool. DONE
 
-//     recovering a little health each turn until fully healed or the
+//     Check whether "key" is in the inventory array to decide if the hero may
 
-//     fire dies after a set number of turns. Report their health as it
+//     pass.
 
-//     climbs, and never let it rise above the maximum.
+//     
+
+//     Hint: How could you use what we've previously learned (loops and ifs) to
+
+//     find if a specific item is in an array?
+
+
+
+// A7: COMBAT ITEMS, NOT PERMANENT UPGRADES. Right now picking up the DONE
+
+//     sword or shield permanently raises attack or defense. Stop doing that. Leave the
+
+//     Do not increase the base stats (attack and defense) of the player.
+
+//
+
+//     Instead, INSIDE each fight, check the inventory and apply the appropriate bonus
+
+//     only in the attack and damage calculations. For example:
+
+//     If the hero is carrying the sword, add swordBonus to the attack and damage roll
+
+//     If the hero is carrying the shield, subtract shieldBonus when reducing damage taken
+
+
+
+// A8: ENEMIES INTO ARRAYS (the data, not the encounters). Right now each enemy DONE
+
+//     is a pile of separate variables (goblinHealth, goblinAttack, ogreHealth,
+
+//     and so on). Put them into arrays instead (enemyNames[], enemyHealth[],
+
+//     enemyAttack[], enemyArmorClass[] and enemyDefense[]), one array element
+
+//     per enemy (element 0 = goblin, element 1 = ogre, element 2 = spider)
+
+//    Keep each fight in its OWN room and read the enemy from the arrays by index.
+
+//
+
+//     Hint: How many arrays do you need? How many elements per array?
+
+
+
+// A9: GOLD BY ROOM. Store the gold each room holds in a roomGold[] array and                          Done
+
+//     total it with a loop, instead of adding gold by hand in each room. As the player
+
+//     walks through each room, add however much gold is in the room to the player's
+
+//     overall gold.
+
+//
+
+//     Hint: How many elements do you need in this array? What should you do if
+
+//     a room doesn't have gold in it?
+
+
+
+// A10: ROOM ENEMIES. Create a roomEnemy[] array alongside your room arrays, DONE
+
+//      one slot per room, holding the index of the enemy waiting there (or -1 for none).
+
+//      As currentRoom advances, if roomEnemy[currentRoom] is not -1, run the
+
+//      enemy's fight. This ties each enemy to its room through the arrays.
+
+//
+
+//      Hint: What data type should the roomEnemy array be if it is an array of indexes?
+
+
+
+// A11: TRACK VISITED ROOMS: Create a "visited" array of bools, one per room, Done
+
+//      so you can mark the rooms the player has already been through.
+
+//
+
+//      Hint: How big should this array be? What data type should it be? What should
+
+//      the starting values be?
+
+
+
+// A12: LOOT TABLE: an array of possible rewards. Print the whole table (or Done
+
+//      pick from it) with a loop instead of writing each reward out by hand. We won't
+
+//      be using this table for anything yet, but add at least three possible rewards.
+
+//      Example rewards could be some kind of healing item, weapon, armor, etc.
+
+
+
+
