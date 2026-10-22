@@ -561,8 +561,9 @@ public class DungeonGame : MonoBehaviour
 
 
     }
-        int coinCurse(int coin) 
+        int CoinCurse(int coin) 
     {
+        Debug.Log(coin);
         return cursedCoins - 2;
     }
     // Enemy and Player Dice rolls are different because I want there to be a greater chance of the player winning for now before we add input.
