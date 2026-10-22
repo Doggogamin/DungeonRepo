@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using UnityEngine;
 
 // ==========================================================================
@@ -10,8 +11,6 @@ using UnityEngine;
 // ==========================================================================
 public class DungeonGame : MonoBehaviour
 {
-    void Start()
-    {
         string[] roomNames = 
             {
             "The Entrance Hall",
@@ -21,56 +20,52 @@ public class DungeonGame : MonoBehaviour
             "The Treasure Room",
             "Long stair case"
         };
-        string[] roomDescriptions =
-            {
+    string[] roomDescriptions =
+        {
             "A torch flickers on the wall. A stone doorway leads north.",
-            "A rusty sword rests on a table. A goblin snores in the corner.",
+            "A rusty sword rests on a table. A goblin snores in the corner. You pick up the sword which gives you an extra 2 attack, the goblin wakes up because of the noise",
             "Ankle-deep water fills the hall. A broken door is at the end of the hallway.",
             "The walls are covered in dusty books from floor to ceiling, there is a large door at the end of the room, and there is a merchant selling potions",
             "It seems this room has been raided.",
-            "A long staircase that leads to a large wooden door" 
+            "A long staircase that leads to a large wooden door"
         };
-        foreach (string roomName in roomNames)
-        {
-            Debug.Log(roomName);
-        }
-        
+    string[] roomDetails =
+    {
+        "The exit is across the hall",
+        "The exit is across the room",
+        "The exit is across the passage",
+        "The exit is across the library",
+        "The exit is across the room",
+        "The exit is up the stairs"
+    };
+
+    const int lowHealth = 2;
+        const int potionPrice = 5;
+        const int healAmount = 5;
         string playerName = "Flip";
-        //
         int playerArmor = 2;
-        //
         int playerPotions = 0;
-        //
         int playerHealth = 15;
-        //
         int playerMaxHealth = 15;
-        //
         int playerAttack = 2;
-        //
         int playerAgility = 5;
-        //
         int playerGold = 15;
-        //
-        
-        //
+        bool playerAlive = true;
         int spiderVenomDamage = 2;
         bool spiderBite = false;
         int spiderBiteDuration = 3;
         bool spiderVenomTaken = false;
-        //
         int playerCritDamage = 2;
         int heavyAttackCounter = 0;
         int heavyAttackCounterMax = 1;
-        
-        //
-        bool playerAlive = true;
-        //
+        bool inCombat = false;
+        int currentEnemy = -1;
         string[] enemyNames =
             {
             "Goblin",
             "Ogre",
             "Spider"
-        };
+            };
         int swordDamageBoost = 2;
         int[] enemyHealth = { 3, 20, 15, };
         int[] enemyAttack = { 2, 4, 2 };
@@ -81,175 +76,130 @@ public class DungeonGame : MonoBehaviour
         bool[] visitedRooms = { false, false, false, false, false, false };
         string[] possibleRewards = { "Sword", "Key", "Potion" };
         int roomNumber = 0;
-        //
-        Debug.Log("=== THE DUNGEON ===");
-        Debug.Log("Welcome, " + playerName + ". Your escape begins.");
-        Debug.Log("Your possible rewards include");
-        foreach (string possibleReward in possibleRewards)
-        {
-            Debug.Log(possibleReward);
-        }
-        //room 1 index 0
-        Debug.Log("");
+        int currentHour = 7;
+        int maxHour = 24;
+        int cursedCoins = 10;
+        void ShowTitle()
+    {
+            
+            Debug.Log("=== THE DUNGEON ===");
+            Debug.Log("Welcome, " + playerName + ". Your escape begins.");
+            Debug.Log("You entered the dungeon at " + currentHour + ":00");
+            Debug.Log("Your possible rewards include: ");
+            foreach (string possibleReward in possibleRewards)
+            {
+                Debug.Log(possibleReward);
+            }
+            Debug.Log("The rooms ahead are: ");
+            foreach (string roomName in roomNames)
+            {
+                Debug.Log(roomName);
+            }
+    }
+
+        void ShowRoom(int index)
+    {
+        Debug.Log("========");
+        TimePassing();
         Debug.Log(roomNames[roomNumber]);
         Debug.Log(roomDescriptions[roomNumber]);
-        visitedRooms[roomNumber] = true;
         if (roomNumber % 3 == 0)
         {
             Debug.Log("Room has a red glow");
         }
-        Debug.Log("You move into the next room.");
-        //room 2 index 1
-        roomNumber += 1;
-        Debug.Log("");
+        visitedRooms[roomNumber] = true;
+    }
+        void ShowRoom(int index, bool isLookingClosely)
+    {
+        Debug.Log("========");
+        TimePassing();
         Debug.Log(roomNames[roomNumber]);
         Debug.Log(roomDescriptions[roomNumber]);
-        visitedRooms[roomNumber] = true;
+        Debug.Log(roomDetails[roomNumber]);
         if (roomNumber % 3 == 0)
         {
             Debug.Log("Room has a red glow");
         }
-        Debug.Log("You pick up the sword which gives you an extra 2 attack, the goblin wakes up because of the noise");
-        items[0] = "Sword";
-        Debug.Log("The goblin attacks you, it has an attack power of " + enemyAttack[roomEnemy[roomNumber]]);
-        //Goblin Fight
-
-        do
+        visitedRooms[roomNumber] = true;
+    }
+        void CombatRound(int enemyIndex)
+    {
+        if(enemyIndex == 0)
         {
-            
-            int playerRandomChance = Random.Range(1, 6);
-            int enemyRandomChance = Random.Range(1, 4);
-            
-
-            if (playerRandomChance < enemyArmor[roomEnemy[roomNumber]])
+            if (RollDice() < enemyArmor[roomEnemy[roomNumber]])
             {
                 Debug.Log(enemyNames[roomEnemy[roomNumber]] + " armor deflected your attack");
-
-                if (enemyRandomChance < playerArmor)
+                
+                if (RollDice(10) < playerArmor)
                 {
                     Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
                 }
-                else if (enemyRandomChance > playerArmor)
+                else if (RollDice(10) > playerArmor)
                 {
                     playerHealth -= enemyAttack[roomEnemy[roomNumber]];
                     Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
-                    if (playerHealth <= 0)
-                    {
-                        Debug.Log(playerName + " Collapsed");
-                        break;
-                    }
-                    else if (playerHealth <= 2)
-                    {
-                        Debug.Log(playerName + " is badly injured");
-                    }
-                    else
-                    {
-                        Debug.Log(playerName + " is fine");
-                    }
+                    ReportCondition(playerHealth);
                 }
 
             }
-            
-            else if (playerRandomChance > enemyArmor[roomEnemy[roomNumber]] && playerRandomChance >= 4)
+
+            else if (RollDice() > enemyArmor[roomEnemy[roomNumber]] && RollDice() >= 4)
             {
                 if (items[0] == "Sword")
                 {
                     enemyHealth[roomEnemy[roomNumber]] -= swordDamageBoost + playerAttack + playerCritDamage;
-                    Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + "plus" + swordDamageBoost + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
-                    
-                        if (enemyRandomChance < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
-                        {
-                            Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
-                            
-                            
-                        }
-                        else if (enemyRandomChance > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
-                        {
-                            playerHealth -= enemyAttack[roomEnemy[roomNumber]];
-                            
-                            Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
-                            if (playerHealth <= 0)
-                            {
-                                Debug.Log(playerName + " Collapsed");
-                                break;
-                            }
-                            else if (playerHealth <= 2)
-                            {
-                                Debug.Log(playerName + " is badly injured");
-                            }
-                            else
-                            {
-                                Debug.Log(playerName + " is fine");
-                            }
-                        }
-                    
-                    
+                    Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + " plus " + swordDamageBoost + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
+                    if (RollDice(10) < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                    {
+                        Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
+
+
+                    }
+                    else if (RollDice(10) > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                    {
+                        playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+
+                        Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
+                        ReportCondition(playerHealth);
+                    }
+
+
                 }
                 else
                 {
                     Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
-                    
-                        if (enemyRandomChance < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
-                        {
-                            Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
-                            
-                            
-                        }
-                        else if (enemyRandomChance > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
-                        {
-                            playerHealth -= enemyAttack[roomEnemy[roomNumber]];
-                            
-                            Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
-                            if (playerHealth <= 0)
-                            {
-                                Debug.Log(playerName + " Collapsed");
-                                break;
-                            }
-                            else if (playerHealth <= 2)
-                            {
-                                Debug.Log(playerName + " is badly injured");
-                            }
-                            else
-                            {
-                                Debug.Log(playerName + " is fine");
-                            }
-                        }
-                    
-                    
+                    if (RollDice(10) < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                    {
+                        Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
+                    }
+                    else if (RollDice(10) > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                    {
+                        playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+                        Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
+                        ReportCondition(playerHealth);
+                    }
+
+
                 }
 
             }
-            else if (playerRandomChance > enemyArmor[roomEnemy[roomNumber]])
+            else if (RollDice() > enemyArmor[roomEnemy[roomNumber]])
             {
                 if (items[0] == "Sword")
                 {
                     enemyHealth[roomEnemy[roomNumber]] -= swordDamageBoost + playerAttack + playerCritDamage;
                     Debug.Log("You dealt " + playerAttack + " plus " + swordDamageBoost + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
-
-                    if (enemyRandomChance < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                    if (RollDice(10) < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
                     {
                         Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
                         heavyAttackCounter = heavyAttackCounterMax;
-                        
+
                     }
-                    else if (enemyRandomChance > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                    else if (RollDice(10) > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
                     {
                         playerHealth -= enemyAttack[roomEnemy[roomNumber]];
-
                         Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
-                        if (playerHealth <= 0)
-                        {
-                            Debug.Log(playerName + " Collapsed");
-                            break;
-                        }
-                        else if (playerHealth <= 2)
-                        {
-                            Debug.Log(playerName + " is badly injured");
-                        }
-                        else
-                        {
-                            Debug.Log(playerName + " is fine");
-                        }
+                        ReportCondition(playerHealth);
                     }
 
 
@@ -258,41 +208,385 @@ public class DungeonGame : MonoBehaviour
                 {
                     Debug.Log("You dealt " + playerAttack + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
 
-                    if (enemyRandomChance < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                    if (RollDice(10) < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
                     {
                         Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
                         heavyAttackCounter = heavyAttackCounterMax;
-                        
+
                     }
-                    else if (enemyRandomChance > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                    else if (RollDice(10) > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
                     {
                         playerHealth -= enemyAttack[roomEnemy[roomNumber]];
-
                         Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
-                        if (playerHealth <= 0)
-                        {
-                            Debug.Log(playerName + " Collapsed");
-                            break;
-                        }
-                        else if (playerHealth <= 2)
-                        {
-                            Debug.Log(playerName + " is badly injured");
-                        }
-                        else
-                        {
-                            Debug.Log(playerName + " is fine");
-                        }
+                        ReportCondition(playerHealth);
                     }
 
 
                 }
 
             }
+        }
+        else if(enemyIndex == 1)
+        {
+            if (RollDice() < enemyArmor[roomEnemy[roomNumber]])
+            {
+                Debug.Log(enemyNames[roomEnemy[roomNumber]] + " armor deflected your attack");
+
+                if (heavyAttackCounter == 0)
+                {
+                    if (RollDice(10) < playerArmor)
+                    {
+                        Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
+                        heavyAttackCounter = heavyAttackCounterMax;
+
+                    }
+                    else if (RollDice(10) > playerArmor)
+                    {
+                        playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+                        heavyAttackCounter = heavyAttackCounterMax;
+                        Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
+                        ReportCondition(playerHealth);
+                    }
+                }
+                else
+                {
+                    heavyAttackCounter -= 1;
+                }
+
+            }
+
+            else if (RollDice() > enemyArmor[roomEnemy[roomNumber]] && RollDice() >= 4)
+            {
+
+                if (items[0] == "Sword")
+                {
+                    enemyHealth[roomEnemy[roomNumber]] -= swordDamageBoost + playerAttack + playerCritDamage;
+                    Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + " plus " + swordDamageBoost + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
+                    if (heavyAttackCounter == 0)
+                    {
+                        if (RollDice(10) < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                        {
+                            Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
+                            heavyAttackCounter = heavyAttackCounterMax;
+
+                        }
+                        else if (RollDice(10) > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                        {
+                            playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+                            heavyAttackCounter = heavyAttackCounterMax;
+                            Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
+                            ReportCondition(playerHealth);
+                        }
+                    }
+                    else
+                    {
+                        heavyAttackCounter -= 1;
+
+                    }
+                }
+                else
+                {
+                    Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
+                    if (heavyAttackCounter == 0)
+                    {
+                        if (RollDice(10) < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                        {
+                            Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
+                            heavyAttackCounter = heavyAttackCounterMax;
+
+                        }
+                        else if (RollDice(10) > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                        {
+                            playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+                            heavyAttackCounter = heavyAttackCounterMax;
+                            Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
+                            ReportCondition(playerHealth);
+                        }
+                    }
+                    else
+                    {
+                        heavyAttackCounter -= 1;
+
+                    }
+                }
+            }
+            else if (RollDice() > enemyArmor[roomEnemy[roomNumber]])
+            {
+                if (items[0] == "Sword")
+                {
+                    enemyHealth[roomEnemy[roomNumber]] -= swordDamageBoost + playerAttack;
+                    Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + " plus " + swordDamageBoost + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
+                    if (heavyAttackCounter == 0)
+                    {
+                        if (RollDice(10) < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                        {
+                            Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
+                            heavyAttackCounter = heavyAttackCounterMax;
+
+                        }
+                        else if (RollDice(10) > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                        {
+                            playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+                            heavyAttackCounter = heavyAttackCounterMax;
+                            Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
+                            ReportCondition(playerHealth);
+                        }
+                    }
+                    else
+                    {
+                        heavyAttackCounter -= 1;
+                    }
+                }
+            }
+        }
+        else if(enemyIndex == 2)
+        {
+            if (spiderBite == true && spiderVenomTaken == false)
+            {
+                if (spiderBiteDuration > 0)
+                {
+                    playerHealth -= spiderVenomDamage;
+                    spiderBiteDuration -= 1;
+                    spiderVenomTaken = true;
+                    Debug.Log("You took " + spiderVenomDamage + " venom damage from the spider");
+                    ReportCondition(playerHealth);
+                }
+                else if (spiderBiteDuration == 0)
+                {
+                    spiderBite = false;
+                    spiderBiteDuration = 3;
+                }
 
 
+            }
+
+            
+            if (RollDice() < enemyArmor[roomEnemy[roomNumber]])
+            {
+                Debug.Log(enemyNames[roomEnemy[roomNumber]] + " armor deflected your attack");
+
+                if (heavyAttackCounter == 0)
+                {
+                    if (RollDice(10) < playerArmor)
+                    {
+                        Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
+                        heavyAttackCounter = heavyAttackCounterMax;
+                        spiderVenomTaken = false;
+                    }
+                    else if (RollDice(10) > playerArmor)
+                    {
+                        playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+                        spiderBite = true;
+                        heavyAttackCounter = heavyAttackCounterMax;
+                        spiderVenomTaken = false;
+                        Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
+                        ReportCondition(playerHealth);
+                    }
+                }
+                else
+                {
+                    heavyAttackCounter -= 1;
+                    spiderVenomTaken = false;
+                }
+
+
+
+
+
+
+            }
+
+            else if (RollDice() > enemyArmor[roomEnemy[roomNumber]] && RollDice() >= 4)
+            {
+
+                if (items[0] == "Sword")
+                {
+                    enemyHealth[roomEnemy[roomNumber]] -= swordDamageBoost + playerAttack + playerCritDamage;
+                    Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + " plus " + swordDamageBoost + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
+                    if (heavyAttackCounter == 0)
+                    {
+                        if (RollDice(10) < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                        {
+                            Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
+                            heavyAttackCounter = heavyAttackCounterMax;
+                            spiderVenomTaken = false;
+                        }
+                        else if (RollDice(10) > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                        {
+                            playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+                            spiderBite = true;
+                            heavyAttackCounter = heavyAttackCounterMax;
+                            spiderVenomTaken = false;
+                            Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
+                            ReportCondition(playerHealth);
+                        }
+                    }
+                    else
+                    {
+                        heavyAttackCounter -= 1;
+                        spiderVenomTaken = false;
+                    }
+                }
+                else
+                {
+                    Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
+                    if (heavyAttackCounter == 0)
+                    {
+                        if (RollDice(10) < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                        {
+                            Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
+                            heavyAttackCounter = heavyAttackCounterMax;
+                            spiderVenomTaken = false;
+                        }
+                        else if (RollDice(10) > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                        {
+                            playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+                            spiderBite = true;
+                            heavyAttackCounter = heavyAttackCounterMax;
+                            spiderVenomTaken = false;
+                            Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
+                            ReportCondition(playerHealth);
+                        }
+                    }
+                    else
+                    {
+                        heavyAttackCounter -= 1;
+                        spiderVenomTaken = false;
+                    }
+                }
+            }
+            else if (RollDice() > enemyArmor[roomEnemy[roomNumber]])
+            {
+                if (items[0] == "Sword")
+                {
+                    enemyHealth[roomEnemy[roomNumber]] -= swordDamageBoost + playerAttack;
+                    Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + " plus " + swordDamageBoost + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
+                    if (heavyAttackCounter == 0)
+                    {
+                        if (RollDice(10) < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                        {
+                            Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
+                            heavyAttackCounter = heavyAttackCounterMax;
+                            spiderVenomTaken = false;
+                        }
+                        else if (RollDice(10) > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
+                        {
+                            playerHealth -= enemyAttack[roomEnemy[roomNumber]];
+                            spiderBite = true;
+                            heavyAttackCounter = heavyAttackCounterMax;
+                            spiderVenomTaken = false;
+                            Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
+                            ReportCondition(playerHealth);
+                        }
+                    }
+                    else
+                    {
+                        heavyAttackCounter -= 1;
+                        spiderVenomTaken = false;
+                    }
+                }
+            }
+        }
+        
+    }
+        void Combat(int enemyIndex)
+        {
+        inCombat = true;
+            while (inCombat)
+            {
+            CombatRound(enemyIndex);
+            }
+        }
+        bool IsAlive()
+        {
+        if (playerHealth > 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+        }
+        int AddGold(int amount)
+    {
+        return playerGold += amount;
+    }
+        int RollDice()
+    {
+        return Random.Range(1, 20);
+    }
+        int RollDice(int sides)
+    {
+        return Random.Range(1, sides);
+    }
+        int RollDice(int min , int max)
+    {
+        return Random.Range(min, max);
+    }
+        void ReportCondition(int health)
+    {
+        if (playerHealth <= 0)
+        {
+            Debug.Log(playerName + " Collapsed");
+            IsAlive();
+        }
+        else if (playerHealth <= 2)
+        {
+            Debug.Log(playerName + " is badly injured");
+        }
+        else
+        {
+            Debug.Log(playerName + " is fine");
+        }
+    }
+        int Heal(int healing = 5)
+        {
+        playerHealth += healing;
+        return healing;
+    }
+        void TimePassing(int time = 1)
+    {
+        currentHour += time;
+        if (currentHour < maxHour)
+        {
+            Debug.Log("The time is " + currentHour + ":00 hours");
+        }
+        else if (currentHour >= maxHour)
+        {
+            currentHour = 0;
+            Debug.Log("The time is " + currentHour + ":00 hours");
+
+        }
+
+
+    }
+        int coinCurse(int coin) 
+    {
+        return cursedCoins - 2;
+    }
+    // Enemy and Player Dice rolls are different because I want there to be a greater chance of the player winning for now before we add input.
+    void Start()
+    {
+
+        //
+        ShowTitle();
+        //room 1 index 0
+        ShowRoom(roomNumber);
+        Debug.Log("You move into the next room.");
+        //room 2 index 1
+        roomNumber += 1;
+        ShowRoom(roomNumber , true);
+
+
+        items[0] = "Sword";
+        Debug.Log("The goblin attacks you, it has an attack power of " + enemyAttack[roomEnemy[roomNumber]]);
+        //Goblin Fight
+
+        do
+        {
+            CombatRound(roomEnemy[roomNumber]);
         } while (playerHealth > 0 && enemyHealth[roomEnemy[roomNumber]] > 0);
-
-
 
         if (enemyHealth[roomEnemy[roomNumber]] <= 0)
         {
@@ -303,12 +597,10 @@ public class DungeonGame : MonoBehaviour
             Debug.Log("You were defeated by the " + enemyNames[roomEnemy[roomNumber]]);
             playerAlive = false;
         }
-//room 3 index 2
+        TimePassing();
+        //room 3 index 2
         roomNumber += 1;
-        Debug.Log("You move into the next room.");
-        Debug.Log(roomNames[roomNumber]);
-        Debug.Log(roomDescriptions[roomNumber]);
-        visitedRooms[roomNumber] = true;
+        ShowRoom(roomNumber);
         if (roomNumber % 3 == 0)
         {
             Debug.Log("Room has a red glow");
@@ -318,212 +610,31 @@ public class DungeonGame : MonoBehaviour
         Debug.Log("You now have " + playerAgility + " agility");
         Debug.Log("There is a ogre blocking your path");
         Debug.Log("You attack the ogre");
-        if (playerAlive)
-        {
+        
             do
             {
-                
-
-
-
-                int playerRandomChance = Random.Range(1, 6);
-                int enemyRandomChance = Random.Range(1, 6);
-
-                if (playerRandomChance < enemyArmor[roomEnemy[roomNumber]])
-                {
-                    Debug.Log(enemyNames[roomEnemy[roomNumber]] + " armor deflected your attack");
-
-                    if (heavyAttackCounter == 0)
-                    {
-                        if (enemyRandomChance < playerArmor)
-                        {
-                            Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
-                            heavyAttackCounter = heavyAttackCounterMax;
-                            
-                        }
-                        else if (enemyRandomChance > playerArmor)
-                        {
-                            playerHealth -= enemyAttack[roomEnemy[roomNumber]];
-                            
-                            heavyAttackCounter = heavyAttackCounterMax;
-                            
-                            Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
-                            if (playerHealth <= 0)
-                            {
-                                Debug.Log(playerName + " Collapsed");
-                                break;
-                            }
-                            else if (playerHealth <= 2)
-                            {
-                                Debug.Log(playerName + " is badly injured");
-                            }
-                            else
-                            {
-                                Debug.Log(playerName + " is fine");
-                            }
-                        }
-                    }
-                    else
-                    {
-                        heavyAttackCounter -= 1;
-                        
-                    }
-
-
-
-
-
-
-                }
-
-                else if (playerRandomChance > enemyArmor[roomEnemy[roomNumber]] && playerRandomChance >= 4)
-                {
-
-                    if (items[0] == "Sword")
-                    {
-                        enemyHealth[roomEnemy[roomNumber]] -= swordDamageBoost + playerAttack + playerCritDamage;
-                        Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + "plus" + swordDamageBoost + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
-                        if (heavyAttackCounter == 0)
-                        {
-                            if (enemyRandomChance < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
-                            {
-                                Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
-                                heavyAttackCounter = heavyAttackCounterMax;
-                                
-                            }
-                            else if (enemyRandomChance > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
-                            {
-                                playerHealth -= enemyAttack[roomEnemy[roomNumber]];
-                                
-                                heavyAttackCounter = heavyAttackCounterMax;
-                                
-                                Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
-                                if (playerHealth <= 0)
-                                {
-                                    Debug.Log(playerName + " Collapsed");
-                                    break;
-                                }
-                                else if (playerHealth <= 2)
-                                {
-                                    Debug.Log(playerName + " is badly injured");
-                                }
-                                else
-                                {
-                                    Debug.Log(playerName + " is fine");
-                                }
-                            }
-                        }
-                        else
-                        {
-                            heavyAttackCounter -= 1;
-                            
-                        }
-                    }
-                    else
-                    {
-                        Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
-                        if (heavyAttackCounter == 0)
-                        {
-                            if (enemyRandomChance < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
-                            {
-                                Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
-                                heavyAttackCounter = heavyAttackCounterMax;
-                                
-                            }
-                            else if (enemyRandomChance > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
-                            {
-                                playerHealth -= enemyAttack[roomEnemy[roomNumber]];
-                                
-                                heavyAttackCounter = heavyAttackCounterMax;
-                                
-                                Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
-                                if (playerHealth <= 0)
-                                {
-                                    Debug.Log(playerName + " Collapsed");
-                                    break;
-                                }
-                                else if (playerHealth <= 2)
-                                {
-                                    Debug.Log(playerName + " is badly injured");
-                                }
-                                else
-                                {
-                                    Debug.Log(playerName + " is fine");
-                                }
-                            }
-                        }
-                        else
-                        {
-                            heavyAttackCounter -= 1;
-                            
-                        }
-                    }
-                }
-                else if (playerRandomChance > enemyArmor[roomEnemy[roomNumber]])
-                {
-                    if (items[0] == "Sword")
-                    {
-                        enemyHealth[roomEnemy[roomNumber]] -= swordDamageBoost + playerAttack;
-                        Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + "plus" + swordDamageBoost + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
-                        if (heavyAttackCounter == 0)
-                        {
-                            if (enemyRandomChance < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
-                            {
-                                Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
-                                heavyAttackCounter = heavyAttackCounterMax;
-                                
-                            }
-                            else if (enemyRandomChance > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
-                            {
-                                playerHealth -= enemyAttack[roomEnemy[roomNumber]];
-                                
-                                heavyAttackCounter = heavyAttackCounterMax;
-                                
-                                Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
-                                if (playerHealth <= 0)
-                                {
-                                    Debug.Log(playerName + " Collapsed");
-                                    break;
-                                }
-                                else if (playerHealth <= 2)
-                                {
-                                    Debug.Log(playerName + " is badly injured");
-                                }
-                                else
-                                {
-                                    Debug.Log(playerName + " is fine");
-                                }
-                            }
-                        }
-                        else
-                        {
-                            heavyAttackCounter -= 1;
-                        }
-                    }
-                }
-
-
+             CombatRound(roomEnemy[roomNumber]);
             } while (playerHealth > 0 && enemyHealth[roomEnemy[roomNumber]] > 0);
+        if (enemyHealth[roomEnemy[roomNumber]] <= 0)
+        {
+            Debug.Log("You defeated the " + enemyNames[roomEnemy[roomNumber]]);
         }
+        else if (playerHealth <= 0)
+        {
+            Debug.Log("You were defeated by the " + enemyNames[roomEnemy[roomNumber]]);
+            playerAlive = false;
+        }
+        TimePassing();
 
 
 
         //room 4 index 3
-        if (enemyHealth[roomEnemy[roomNumber]] <= 0)
-        {
-            roomNumber += 1;
-            Debug.Log("You defeated the ogre");
-            Debug.Log("You move into the next room.");
-            Debug.Log(roomNames[roomNumber]);
-            Debug.Log(roomDescriptions[roomNumber]);
-            visitedRooms[roomNumber] = true;
-            if (roomNumber % 3 == 0)
-            {
-                Debug.Log("Room has a red glow");
-            }
+
+        roomNumber += 1;
+            ShowRoom(roomNumber);
             Debug.Log("You buy a potion from the merchant for 5 gold");
 
-            playerGold -= 5;
+            playerGold -= potionPrice;
             playerPotions += 1;
             items[1] = "Potion";
             Debug.Log("You now have " + playerGold + " gold");
@@ -544,27 +655,17 @@ public class DungeonGame : MonoBehaviour
 
             Debug.Log("You move into the next room.");
             Debug.Log("you reach a vault door and a long hallway around the vault");
-        }
-        else if (playerHealth <= 0)
-        {
-            Debug.Log("You were defeated by the ogre");
-            playerAlive = false;
-        }
+        
+        
 
 
+        
         roomNumber += 1;
-        visitedRooms[roomNumber] = true;
         //room 5 index 4
         if (items[3] == "Key" && playerHealth > 0)
         {
-            Debug.Log(roomNames[roomNumber]);
-            
-            if (roomNumber % 3 == 0)
-            {
-                Debug.Log("Room has a red glow");
-            }
-            playerGold += roomGold[roomNumber];
-            Debug.Log(roomDescriptions[roomNumber]);
+            ShowRoom(roomNumber);
+            AddGold(roomGold[roomNumber]);
             Debug.Log("You now have " + playerGold + " gold");
             Debug.Log("You move into the next room.");
         }
@@ -577,260 +678,65 @@ public class DungeonGame : MonoBehaviour
         
         else
         {
+            TimePassing();
             Debug.Log("You do not have a key and must go around");
         }
 
 
         //room 6 index 5
         roomNumber += 1;
-        Debug.Log(roomNames[roomNumber]);
-        Debug.Log(roomDescriptions[roomNumber]);
-        visitedRooms[roomNumber] = true;
-        if (roomNumber % 3 == 0)
-        {
-            Debug.Log("Room has a red glow");
-        }
+        ShowRoom(roomNumber);
         Debug.Log("A spider drops down from the ceiling");
         Debug.Log("You attack the spider");
         if (playerAlive)
         {
             do
             {
-                if (spiderBite == true && spiderVenomTaken == false)
-                {
-                    if (spiderBiteDuration > 0)
-                    {
-                        playerHealth -= spiderVenomDamage;
-                        spiderBiteDuration -= 1;
-                        spiderVenomTaken = true;
-                        Debug.Log("You took " + spiderVenomDamage + " venom damage from the spider");
-                        if (playerHealth <= 0)
-                        {
-                            Debug.Log(playerName + " Collapsed");
-                            break;
-                        }
-                        else if (playerHealth <= 2)
-                        {
-                            Debug.Log(playerName + " is badly injured");
-                        }
-                        else
-                        {
-                            Debug.Log(playerName + " is fine");
-                        }
-                    }
-                    else if (spiderBiteDuration == 0)
-                    {
-                        spiderBite = false;
-                        spiderBiteDuration = 3;
-                    }
-
-
-                }
-
-
-
-                int playerRandomChance = Random.Range(1, 6);
-                int enemyRandomChance = Random.Range(1, 6);
-
-                if (playerRandomChance < enemyArmor[roomEnemy[roomNumber]])
-                {
-                    Debug.Log(enemyNames[roomEnemy[roomNumber]] + " armor deflected your attack");
-
-                    if (heavyAttackCounter == 0)
-                    {
-                        if (enemyRandomChance < playerArmor)
-                        {
-                            Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
-                            heavyAttackCounter = heavyAttackCounterMax;
-                            spiderVenomTaken = false;
-                        }
-                        else if (enemyRandomChance > playerArmor)
-                        {
-                            playerHealth -= enemyAttack[roomEnemy[roomNumber]];
-                            spiderBite = true;
-                            heavyAttackCounter = heavyAttackCounterMax;
-                            spiderVenomTaken = false;
-                            Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
-                            if (playerHealth <= 0)
-                            {
-                                Debug.Log(playerName + " Collapsed");
-                                break;
-                            }
-                            else if (playerHealth <= 2)
-                            {
-                                Debug.Log(playerName + " is badly injured");
-                            }
-                            else
-                            {
-                                Debug.Log(playerName + " is fine");
-                            }
-                        }
-                    }
-                    else
-                    {
-                        heavyAttackCounter -= 1;
-                        spiderVenomTaken = false;
-                    }
-
-
-
-
-
-
-                }
-
-                else if (playerRandomChance > enemyArmor[roomEnemy[roomNumber]] && playerRandomChance >= 4)
-                {
-                    
-                    if (items[0] == "Sword")
-                    {
-                        enemyHealth[roomEnemy[roomNumber]] -= swordDamageBoost + playerAttack + playerCritDamage;
-                        Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + "plus" + swordDamageBoost + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
-                        if (heavyAttackCounter == 0)
-                        {
-                            if (enemyRandomChance < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
-                            {
-                                Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
-                                heavyAttackCounter = heavyAttackCounterMax;
-                                spiderVenomTaken = false;
-                            }
-                            else if (enemyRandomChance > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
-                            {
-                                playerHealth -= enemyAttack[roomEnemy[roomNumber]];
-                                spiderBite = true;
-                                heavyAttackCounter = heavyAttackCounterMax;
-                                spiderVenomTaken = false;
-                                Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
-                                if (playerHealth <= 0)
-                                {
-                                    Debug.Log(playerName + " Collapsed");
-                                    break;
-                                }
-                                else if (playerHealth <= 2)
-                                {
-                                    Debug.Log(playerName + " is badly injured");
-                                }
-                                else
-                                {
-                                    Debug.Log(playerName + " is fine");
-                                }
-                            }
-                        }
-                        else
-                        {
-                            heavyAttackCounter -= 1;
-                            spiderVenomTaken = false;
-                        }
-                    }
-                    else
-                    {
-                        Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
-                        if (heavyAttackCounter == 0)
-                        {
-                            if (enemyRandomChance < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
-                            {
-                                Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
-                                heavyAttackCounter = heavyAttackCounterMax;
-                                spiderVenomTaken = false;
-                            }
-                            else if (enemyRandomChance > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
-                            {
-                                playerHealth -= enemyAttack[roomEnemy[roomNumber]];
-                                spiderBite = true;
-                                heavyAttackCounter = heavyAttackCounterMax;
-                                spiderVenomTaken = false;
-                                Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
-                                if (playerHealth <= 0)
-                                {
-                                    Debug.Log(playerName + " Collapsed");
-                                    break;
-                                }
-                                else if (playerHealth <= 2)
-                                {
-                                    Debug.Log(playerName + " is badly injured");
-                                }
-                                else
-                                {
-                                    Debug.Log(playerName + " is fine");
-                                }
-                            }
-                        }
-                        else
-                        {
-                            heavyAttackCounter -= 1;
-                            spiderVenomTaken = false;
-                        }
-                    }
-                }
-                else if (playerRandomChance > enemyArmor[roomEnemy[roomNumber]])
-                {
-                    if (items[0] == "Sword")
-                    {
-                        enemyHealth[roomEnemy[roomNumber]] -= swordDamageBoost + playerAttack;
-                        Debug.Log("You dealt " + playerAttack + " plus " + playerCritDamage + "plus" + swordDamageBoost + " damage to the " + enemyNames[roomEnemy[roomNumber]] + " with a critical hit");
-                        if (heavyAttackCounter == 0)
-                        {
-                            if (enemyRandomChance < playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
-                            {
-                                Debug.Log("You deflected the " + enemyNames[roomEnemy[roomNumber]] + " attack");
-                                heavyAttackCounter = heavyAttackCounterMax;
-                                spiderVenomTaken = false;
-                            }
-                            else if (enemyRandomChance > playerArmor && enemyHealth[roomEnemy[roomNumber]] > 0)
-                            {
-                                playerHealth -= enemyAttack[roomEnemy[roomNumber]];
-                                spiderBite = true;
-                                heavyAttackCounter = heavyAttackCounterMax;
-                                spiderVenomTaken = false;
-                                Debug.Log("You took " + enemyAttack[roomEnemy[roomNumber]] + " damage from the " + enemyNames[roomEnemy[roomNumber]]);
-                                if (playerHealth <= 0)
-                                {
-                                    Debug.Log(playerName + " Collapsed");
-                                    break;
-                                }
-                                else if (playerHealth <= 2)
-                                {
-                                    Debug.Log(playerName + " is badly injured");
-                                }
-                                else
-                                {
-                                    Debug.Log(playerName + " is fine");
-                                }
-                            }
-                        }
-                        else
-                        {
-                            heavyAttackCounter -= 1;
-                            spiderVenomTaken = false;
-                        }
-                    }
-                }
-
-
+                CombatRound(roomEnemy[roomNumber]);
             } while (playerHealth > 0 && enemyHealth[roomEnemy[roomNumber]] > 0);
         }
-
-
+        TimePassing();
+        Debug.Log("You have " + playerHealth + " health remaining");
         int campfireCounter = 10;
-        int campfireHeal = 5;
         if (enemyHealth[roomEnemy[roomNumber]] <= 0)
         {
             Debug.Log("You defeated the spider");
             Debug.Log("You move to the door and exit the dungeon");
             Debug.Log("You find a campfire");
-            while (playerHealth <= playerMaxHealth && campfireCounter > 0)
+            while (campfireCounter > 0)
             {
-
-                Debug.Log("You sit at the campfire to regain health and regain 1 health");
-                playerHealth += campfireHeal;
-                campfireCounter -= 1;
+                if (playerHealth < playerMaxHealth - healAmount)
+                {
+                    Debug.Log("You sit at the campfire to regain health and regain " + Heal() + " health");
+                    campfireCounter -= 1;
+                    if (playerHealth == playerMaxHealth)
+                    {
+                        break;
+                    }
+                }
+                else if (playerHealth >= playerMaxHealth - healAmount && playerHealth < playerMaxHealth)
+                {
+                    int healthDifference = playerHealth - playerMaxHealth;
+                    int absoluteHealthDifference = -healthDifference;
+                    Debug.Log("You sit at the campfire to regain health and regain " + Heal(absoluteHealthDifference) + " health");
+                    campfireCounter = 0;
+                    break;
+                }
+                
+                else if(playerHealth == playerMaxHealth)
+                {
+                    campfireCounter = 0;
+                    break;
+                }
             }
+
             Debug.Log("You now have " + playerHealth + " health");
         }
         else if (playerHealth <= 0)
         {
             Debug.Log("You were defeated by the spider");
         }
+        TimePassing();
         Debug.Log("Your final inventory");
         Debug.Log("▽ ▽ ▽ ▽ ▽");
         foreach (string item in items)
